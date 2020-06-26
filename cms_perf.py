@@ -25,9 +25,9 @@ def duration(literal: str) -> float:
     try:
         scale = INTERVAL_UNITS[unit]
     except KeyError:
-        expected = ", ".join(INTERVAL_UNITS)
+        expected = ", ".join(map(repr, INTERVAL_UNITS))
         raise argparse.ArgumentTypeError(
-            f"{unit} is not a valid time unit – expected one of {expected}"
+            f"{unit!r} is not a valid time unit – expected one of {expected}"
         )
     return float(value) * scale
 
