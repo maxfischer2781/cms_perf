@@ -54,7 +54,7 @@ def system_load(max_core_runq: float, interval: float) -> int:
 
 
 def cpu_utilization(interval: float) -> int:
-    sample_interval = min(interval / 3, 10)
+    sample_interval = min(interval / 4, 1)
     return int(psutil.cpu_percent(interval=sample_interval))
 
 
@@ -76,7 +76,7 @@ def network_utilization(interval: float) -> int:
         for nic, stats in psutil.net_if_stats().items()
         if stats.isup and stats.speed > 0
     }
-    sample_interval = min(interval / 3, 10)
+    sample_interval = min(interval / 4, 1)
     sent_old = _get_sent_bytes()
     time.sleep(sample_interval)
     sent_new = _get_sent_bytes()
@@ -87,16 +87,27 @@ def network_utilization(interval: float) -> int:
     return int(max(interface_utilization.values()) * 100)
 
 
-def run_forever(max_core_runq: float, interval: float):
+def every(interval: float):
     while True:
-        values = (
-            system_load(max_core_runq, interval),
-            cpu_utilization(interval),
-            memory_utilization(),
-            0,
-            network_utilization(interval),
-        )
-        print(*values)
+        suspended = time.time()
+        yield
+        duration = time.time() - suspended
+        time.sleep(max(0.1, interval - duration))
+
+
+def run_forever(max_core_runq: float, interval: float):
+    try:
+        for _ in every(interval):
+            values = (
+                system_load(max_core_runq, interval),
+                cpu_utilization(interval),
+                memory_utilization(),
+                0,
+                network_utilization(interval),
+            )
+            print(*values)
+    except KeyboardInterrupt:
+        pass
 
 
 def main():
