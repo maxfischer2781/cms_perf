@@ -1,7 +1,7 @@
 """Sensor for the XRootD cms.perf directive"""
 #   See the https://xrootd.slac.stanford.edu/doc/dev410/cms_config.htm#_Toc8247264
 # The specified program must write 5 white-space separated numbers to standard out.
-# The last number must be terminated by a new-line character (“\n”). Each number must
+# The last number must be terminated by a new-line character ("\n"). Each number must
 # be normalized to 100, with 0 indicating no load and 100 indicating saturation. The
 # numbers are in the order:
 # 1.      system load
