@@ -84,7 +84,7 @@ def network_utilization(interval: float) -> int:
         nic: (sent_new[nic] - sent_old[nic]) / interface_speed[nic]
         for nic in interface_speed.keys() & sent_old.keys() & sent_new.keys()
     }
-    return max(interface_utilization.values())
+    return int(max(interface_utilization.values()) * 100)
 
 
 def run_forever(max_core_runq: float, interval: float):
