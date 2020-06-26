@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Sensor for the XRootD cms.perf directive"""
 #   See the https://xrootd.slac.stanford.edu/doc/dev410/cms_config.htm#_Toc8247264
 # The specified program must write 5 white-space separated numbers to standard out.
