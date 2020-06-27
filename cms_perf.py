@@ -38,7 +38,7 @@ CLI = argparse.ArgumentParser(
 CLI.add_argument(
     "--max-core-runq",
     default=1,
-    help="Maximum runq/loadavg per core considered 100",
+    help="Maximum runq/loadavg per core considered 100%%",
     type=float,
 )
 CLI.add_argument(
