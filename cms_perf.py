@@ -33,7 +33,17 @@ def duration(literal: str) -> float:
 
 
 CLI = argparse.ArgumentParser(
-    description="Performance Sensor for XRootD cms.perf directive"
+    description="Performance Sensor for XRootD cms.perf directive",
+    epilog=(
+        "In regular intervals, outputs a single line with percentages of: "
+        "system load, "
+        "cpu utilization, "
+        "memory utilizaion, "
+        "paging load, and "
+        "network utilization. "
+        "The paging load exists for historical reasons; "
+        "it cannot be reliably computed."
+    ),
 )
 CLI.add_argument(
     "--max-core-runq",
