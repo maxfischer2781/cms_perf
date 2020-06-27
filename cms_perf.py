@@ -15,7 +15,7 @@ import time
 
 import psutil
 
-__version__ = '0.1'
+__version__ = '0.1.1'
 
 
 INTERVAL_UNITS = {"": 1, "s": 1, "m": 60, "h": 60 * 60}
