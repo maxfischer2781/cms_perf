@@ -106,15 +106,22 @@ def every(interval: float):
         time.sleep(max(0.1, interval - duration))
 
 
+def cap_percentages(value):
+    return 0 if value < 0 else 100 if value > 100 else value
+
+
 def run_forever(max_core_runq: float, interval: float):
     try:
         for _ in every(interval):
-            values = (
-                system_load(max_core_runq, interval),
-                cpu_utilization(interval),
-                memory_utilization(),
-                0,
-                network_utilization(interval),
+            values = map(
+                cap_percentages,
+                (
+                    system_load(max_core_runq, interval),
+                    cpu_utilization(interval),
+                    memory_utilization(),
+                    0,
+                    network_utilization(interval),
+                ),
             )
             print(*values)
     except KeyboardInterrupt:
