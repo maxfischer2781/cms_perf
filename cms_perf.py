@@ -15,7 +15,7 @@ import time
 
 import psutil
 
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 
 
 INTERVAL_UNITS = {"": 1, "s": 1, "m": 60, "h": 60 * 60}
@@ -125,7 +125,7 @@ def run_forever(max_core_runq: float, interval: float):
                     network_utilization(interval),
                 ),
             )
-            print(*values)
+            print(*values, flush=True)
     except KeyboardInterrupt:
         pass
 
