@@ -46,9 +46,13 @@ the sensor's ``--interval``.
 
 .. code::
 
-    cms.perf int 5m pgm cms_perf --interval 5m
+    # installed for system python
+    cms.perf int 2m pgm /usr/local/bin/cms_perf --interval 2m
+    # installed for virtual environment
+    cms.perf int 2m pgm /path/to/venv/bin/python -m cms_perf --interval 2m
 
-See the `cms.perf documentation`_ for details.
+See the `cms.perf documentation`_ for details of the directive.
+Consult the sensor's help via ``cms_perf --help`` for details of the sensor.
 
 .. _psutil documentation: https://psutil.readthedocs.io/
 .. _cms.perf documentation: https://xrootd.slac.stanford.edu/doc/dev410/cms_config.htm#_Toc8247264
