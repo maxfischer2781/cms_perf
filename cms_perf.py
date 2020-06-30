@@ -22,6 +22,7 @@ INTERVAL_UNITS = {"": 1, "s": 1, "m": 60, "h": 60 * 60}
 
 
 def duration(literal: str) -> float:
+    """Parse a duration literal as a float representing seconds"""
     literal = literal.strip()
     value, unit = (literal, "") if literal.isdigit() else (literal[:-1], literal[-1])
     try:
@@ -61,6 +62,7 @@ CLI.add_argument(
 )
 
 
+# individual sensors for system state
 def system_load(max_core_runq: float, interval: float) -> int:
     loadavg_index = 0 if interval <= 60 else 1 if interval <= 300 else 2
     return int(psutil.getloadavg()[loadavg_index] / psutil.cpu_count() / max_core_runq)
@@ -100,6 +102,7 @@ def network_utilization(interval: float) -> int:
     return int(max(interface_utilization.values()) * 100)
 
 
+# sensor data reporting
 def every(interval: float):
     while True:
         suspended = time.time()
