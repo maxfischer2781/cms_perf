@@ -65,7 +65,9 @@ CLI.add_argument(
 # individual sensors for system state
 def system_load(max_core_runq: float, interval: float) -> int:
     loadavg_index = 0 if interval <= 60 else 1 if interval <= 300 else 2
-    return int(psutil.getloadavg()[loadavg_index] / psutil.cpu_count() / max_core_runq)
+    return int(
+        100 * psutil.getloadavg()[loadavg_index] / psutil.cpu_count() / max_core_runq
+    )
 
 
 def cpu_utilization(interval: float) -> int:
