@@ -22,7 +22,13 @@ INTERVAL_UNITS = {"": 1, "s": 1, "m": 60, "h": 60 * 60}
 
 
 def duration(literal: str) -> float:
-    """Parse a duration literal as a float representing seconds"""
+    """
+    Parse an XRootD duration literal as a float representing seconds
+
+    A literal consists of a float literal, e.g. ``12`` or ``17.5``,
+    and an optional unit ``s`` (for seconds), ``m`` (for minutes),
+    or ``h`` (for hours). If no unit is given, ``s`` is assumed.
+    """
     literal = literal.strip()
     value, unit = (literal, "") if literal.isdigit() else (literal[:-1], literal[-1])
     try:
@@ -64,17 +70,19 @@ CLI.add_argument(
 
 # individual sensors for system state
 def system_load(interval: float) -> float:
-    """Get the current system load most closely matching ``interval``"""
+    """Get the current system load sample most closely matching ``interval``"""
     loadavg_index = 0 if interval <= 60 else 1 if interval <= 300 else 2
     return 100.0 * psutil.getloadavg()[loadavg_index] / psutil.cpu_count()
 
 
 def cpu_utilization(interval: float) -> float:
+    """Get the current cpu utilisation relative to ``interval``"""
     sample_interval = min(interval / 4, 1)
     return psutil.cpu_percent(interval=sample_interval)
 
 
 def memory_utilization() -> float:
+    """Get the current memory utilisation"""
     return psutil.virtual_memory().percent
 
 
@@ -86,6 +94,7 @@ def _get_sent_bytes():
 
 
 def network_utilization(interval: float) -> float:
+    """Get the current network utilisation relative to ``interval``"""
     interface_speed = {
         # speed: the NIC speed expressed in mega *bits*
         nic: stats.speed * 125000
@@ -105,6 +114,12 @@ def network_utilization(interval: float) -> float:
 
 # sensor data reporting
 def every(interval: float):
+    """
+    Iterable that wakes up roughly every ``interval`` seconds
+
+    The iterable pauses so that the time spent between iterations
+    plus the pause time equals ``interval`` as closely as possible.
+    """
     while True:
         suspended = time.time()
         yield
@@ -113,11 +128,13 @@ def every(interval: float):
 
 
 def cap_percentages(value: float) -> int:
+    """Clamp a percentage ``value`` to lie between 0 and 100"""
     value = int(value)
     return 0 if value < 0 else 100 if value > 100 else value
 
 
 def run_forever(max_core_runq: float, interval: float):
+    """Write sensor information to stdout every ``interval`` seconds"""
     try:
         for _ in every(interval):
             values = map(
@@ -136,6 +153,7 @@ def run_forever(max_core_runq: float, interval: float):
 
 
 def main():
+    """Run the sensor based on CLI arguments"""
     options = CLI.parse_args()
     run_forever(max_core_runq=options.max_core_runq, interval=options.interval)
 
