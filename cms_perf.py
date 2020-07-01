@@ -127,10 +127,9 @@ def every(interval: float):
         time.sleep(max(0.1, interval - duration))
 
 
-def cap_percentages(value: float) -> int:
-    """Clamp a percentage ``value`` to lie between 0 and 100"""
-    value = int(value)
-    return 0 if value < 0 else 100 if value > 100 else value
+def clamp_percentages(value: float) -> int:
+    """Restrict a percentage ``value`` to an integer between 0 and 100"""
+    return 0 if value < 0.0 else 100 if value > 100.0 else int(value)
 
 
 def run_forever(max_core_runq: float, interval: float):
@@ -138,7 +137,7 @@ def run_forever(max_core_runq: float, interval: float):
     try:
         for _ in every(interval):
             values = map(
-                cap_percentages,
+                clamp_percentages,
                 (
                     system_load(interval) / max_core_runq,
                     cpu_utilization(interval),
