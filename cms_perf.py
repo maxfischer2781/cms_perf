@@ -69,13 +69,13 @@ def system_load(interval: float) -> float:
     return 100.0 * psutil.getloadavg()[loadavg_index] / psutil.cpu_count()
 
 
-def cpu_utilization(interval: float) -> int:
+def cpu_utilization(interval: float) -> float:
     sample_interval = min(interval / 4, 1)
-    return int(psutil.cpu_percent(interval=sample_interval))
+    return psutil.cpu_percent(interval=sample_interval)
 
 
-def memory_utilization() -> int:
-    return int(psutil.virtual_memory().percent)
+def memory_utilization() -> float:
+    return psutil.virtual_memory().percent
 
 
 def _get_sent_bytes():
@@ -85,7 +85,7 @@ def _get_sent_bytes():
     }
 
 
-def network_utilization(interval: float) -> int:
+def network_utilization(interval: float) -> float:
     interface_speed = {
         # speed: the NIC speed expressed in mega *bits*
         nic: stats.speed * 125000
@@ -100,7 +100,7 @@ def network_utilization(interval: float) -> int:
         nic: (sent_new[nic] - sent_old[nic]) / interface_speed[nic]
         for nic in interface_speed.keys() & sent_old.keys() & sent_new.keys()
     }
-    return int(max(interface_utilization.values()) * 100)
+    return 100.0 * max(interface_utilization.values())
 
 
 # sensor data reporting
