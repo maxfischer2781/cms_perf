@@ -63,11 +63,10 @@ CLI.add_argument(
 
 
 # individual sensors for system state
-def system_load(max_core_runq: float, interval: float) -> int:
+def system_load(interval: float) -> float:
+    """Get the current system load most closely matching ``interval``"""
     loadavg_index = 0 if interval <= 60 else 1 if interval <= 300 else 2
-    return int(
-        100 * psutil.getloadavg()[loadavg_index] / psutil.cpu_count() / max_core_runq
-    )
+    return 100.0 * psutil.getloadavg()[loadavg_index] / psutil.cpu_count()
 
 
 def cpu_utilization(interval: float) -> int:
@@ -113,7 +112,8 @@ def every(interval: float):
         time.sleep(max(0.1, interval - duration))
 
 
-def cap_percentages(value):
+def cap_percentages(value: float) -> int:
+    value = int(value)
     return 0 if value < 0 else 100 if value > 100 else value
 
 
@@ -123,7 +123,7 @@ def run_forever(max_core_runq: float, interval: float):
             values = map(
                 cap_percentages,
                 (
-                    system_load(max_core_runq, interval),
+                    system_load(interval) / max_core_runq,
                     cpu_utilization(interval),
                     memory_utilization(),
                     0,
