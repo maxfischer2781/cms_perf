@@ -12,6 +12,7 @@
 # 5.      network utilization.
 import argparse
 import time
+import sys
 
 import psutil
 
@@ -66,6 +67,10 @@ CLI.add_argument(
     help="Interval between output; suffixed by s (default), m, or h",
     type=duration,
 )
+CLI.add_argument(
+    "--sched",
+    help="cms.sched directive to report total load and maxload on stderr",
+)
 
 
 # individual sensors for system state
@@ -113,6 +118,30 @@ def network_utilization(interval: float) -> float:
 
 
 # sensor data reporting
+class PseudoSched:
+    def __init__(self, cpu=0, io=0, mem=0, pag=0, runq=0, maxload=100):
+        self.cpu = cpu
+        self.io = io
+        self.mem = mem
+        self.pag = pag
+        self.runq = runq
+        self.maxload = maxload
+
+    @classmethod
+    def from_directive(cls, directive: str):
+        items = directive.split()
+        policy = {
+            word: int(value)
+            for word, value in zip(items[:-1], items[1:])
+            if word in {'cpu', 'io', 'mem', 'pag', 'runq', 'maxload'}
+        } if len(items) > 1 else {}
+        return cls(**policy)
+
+    def weight(self, runq: float, cpu: float, mem: float, paq, io: float):
+        load = (cpu * self.cpu + io * self.io + mem * self.mem + runq * self.runq) / 100
+        return int(load), load > self.maxload
+
+
 def every(interval: float):
     """
     Iterable that wakes up roughly every ``interval`` seconds
@@ -132,11 +161,11 @@ def clamp_percentages(value: float) -> int:
     return 0 if value < 0.0 else 100 if value > 100.0 else int(value)
 
 
-def run_forever(max_core_runq: float, interval: float):
+def run_forever(max_core_runq: float, interval: float, sched: PseudoSched = None):
     """Write sensor information to stdout every ``interval`` seconds"""
     try:
         for _ in every(interval):
-            values = map(
+            *values, = map(
                 clamp_percentages,
                 (
                     system_load(interval) / max_core_runq,
@@ -147,6 +176,9 @@ def run_forever(max_core_runq: float, interval: float):
                 ),
             )
             print(*values, flush=True)
+            if sched is not None:
+                load, rejected = sched.weight(*values)
+                print(load, '!' if rejected else '', file=sys.stderr)
     except KeyboardInterrupt:
         pass
 
@@ -154,7 +186,8 @@ def run_forever(max_core_runq: float, interval: float):
 def main():
     """Run the sensor based on CLI arguments"""
     options = CLI.parse_args()
-    run_forever(max_core_runq=options.max_core_runq, interval=options.interval)
+    sched = PseudoSched.from_directive(options.sched) if options.sched else None
+    run_forever(max_core_runq=options.max_core_runq, interval=options.interval, sched=sched)
 
 
 if __name__ == "__main__":
