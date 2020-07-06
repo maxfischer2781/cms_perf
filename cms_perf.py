@@ -119,6 +119,7 @@ def network_utilization(interval: float) -> float:
 
 # sensor data reporting
 class PseudoSched:
+    """Imitation of the ``cms.sched`` directive to compute total load"""
     def __init__(self, cpu=0, io=0, mem=0, pag=0, runq=0, maxload=100):
         self.cpu = cpu
         self.io = io
@@ -129,6 +130,7 @@ class PseudoSched:
 
     @classmethod
     def from_directive(cls, directive: str):
+        """Create an instance by parsing a ``cms.sched`` directive"""
         items = directive.split()
         policy = {
             word: int(value)
@@ -138,6 +140,11 @@ class PseudoSched:
         return cls(**policy)
 
     def weight(self, runq: float, cpu: float, mem: float, paq, io: float):
+        """
+        Rate the total load by weighting each individual load value
+
+        Returns the total load and whether the load exceeds the ``maxload``.
+        """
         load = (cpu * self.cpu + io * self.io + mem * self.mem + runq * self.runq) / 100
         return int(load), load > self.maxload
 

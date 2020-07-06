@@ -30,7 +30,7 @@ The sensor can be installed using the Python package manager:
 Installing the sensor creates a ``cms_perf`` executable.
 
 When installed for a non-standard Python, such as a venv,
-the module can be run directly:
+the module can be run directly by the respective python executable:
 
 .. code::
 
@@ -53,6 +53,31 @@ the sensor's ``--interval``.
 
 See the `cms.perf documentation`_ for details of the directive.
 Consult the sensor's help via ``cms_perf --help`` for details of the sensor.
+
+Testing `cms.sched` policies
+------------------------
+
+To gauge how a server is rated by a manager ``cms``,
+``cms_perf`` allows to evaluate the total weight of the collected sensor data.
+Use the ``--sched`` option and pass a ``cms.sched`` directive that you want to test;
+in addition to the sensor data on stdout, the total weight is written to stderr.
+
+.. code::
+
+    $ python3 -m cms_perf --interval=1 --sched 'cms.sched runq 20 cpu 20 mem 60 maxload 45'
+    13 1 70 0 0
+    44
+    13 3 70 0 0
+    45 !
+    13 1 70 0 0
+    44
+    13 1 70 0 0
+    44
+    13 2 70 0 0
+    45
+
+If ``maxload`` is given, a ``!`` indicates whether the load exceeds it.
+All unused options, including the ``cms.sched`` word, are ignored and may be omitted.
 
 .. _psutil documentation: https://psutil.readthedocs.io/
 .. _cms.perf documentation: https://xrootd.slac.stanford.edu/doc/dev410/cms_config.htm#_Toc8247264
