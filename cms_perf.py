@@ -182,10 +182,11 @@ def run_forever(max_core_runq: float, interval: float, sched: PseudoSched = None
                     network_utilization(interval),
                 ),
             )
-            print(*values, flush=True)
+            print(*values, end='', flush=True)
             if sched is not None:
                 load, rejected = sched.weight(*values)
-                print(load, '!' if rejected else '', file=sys.stderr)
+                print(f" {load}{'!' if rejected else ''}", end='', file=sys.stderr, flush=True)
+            print(flush=True)
     except KeyboardInterrupt:
         pass
 

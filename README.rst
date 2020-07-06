@@ -65,16 +65,11 @@ in addition to the sensor data on stdout, the total weight is written to stderr.
 .. code::
 
     $ python3 -m cms_perf --interval=1 --sched 'cms.sched runq 20 cpu 20 mem 60 maxload 45'
-    13 1 70 0 0
-    44
-    13 3 70 0 0
-    45 !
-    13 1 70 0 0
-    44
-    13 1 70 0 0
-    44
-    13 2 70 0 0
-    45
+    13 1 70 0 0 44
+    13 3 70 0 0 45!
+    13 1 70 0 0 44
+    13 1 70 0 0 44
+    13 2 70 0 0 45
 
 If ``maxload`` is given, a ``!`` indicates whether the load exceeds it.
 All unused options, including the ``cms.sched`` word, are ignored and may be omitted.
