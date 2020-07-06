@@ -55,7 +55,7 @@ See the `cms.perf documentation`_ for details of the directive.
 Consult the sensor's help via ``cms_perf --help`` for details of the sensor.
 
 Testing `cms.sched` policies
-------------------------
+----------------------------
 
 To gauge how a server is rated by a manager ``cms``,
 ``cms_perf`` allows to evaluate the total weight of the collected sensor data.
