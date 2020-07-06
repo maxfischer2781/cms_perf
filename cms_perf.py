@@ -95,13 +95,13 @@ def _get_sent_bytes():
 
 def network_utilization(interval: float) -> float:
     """Get the current network utilisation relative to ``interval``"""
+    sample_interval = min(interval / 4, 1)
     interface_speed = {
-        # speed: the NIC speed expressed in mega *bits*
-        nic: stats.speed * 125000
+        # speed: the NIC speed expressed in mega *bits* per second
+        nic: stats.speed * 125000 * sample_interval
         for nic, stats in psutil.net_if_stats().items()
         if stats.isup and stats.speed > 0
     }
-    sample_interval = min(interval / 4, 1)
     sent_old = _get_sent_bytes()
     time.sleep(sample_interval)
     sent_new = _get_sent_bytes()
