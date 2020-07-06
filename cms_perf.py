@@ -134,15 +134,11 @@ class PseudoSched:
     def from_directive(cls, directive: str):
         """Create an instance by parsing a ``cms.sched`` directive"""
         items = directive.split()
-        policy = (
-            {
-                word: int(value)
-                for word, value in zip(items[:-1], items[1:])
-                if word in {"cpu", "io", "mem", "pag", "runq", "maxload"}
-            }
-            if len(items) > 1
-            else {}
-        )
+        policy = {
+            word: int(value)
+            for word, value in zip(items[:-1], items[1:])
+            if word in {"cpu", "io", "mem", "pag", "runq", "maxload"}
+        }
         return cls(**policy)
 
     def weight(self, runq: float, cpu: float, mem: float, paq, io: float):
