@@ -23,7 +23,11 @@ cms_perf = "cms_perf:main"
 [tool.flit.metadata.requires-extra]
 test = [
     "pytest >=4.3.0",
+    "codecov",
     "flake8",
     "flake8-bugbear",
     "black; implementation_name=='cpython'",
 ]
+
+[tool.black]
+target-version = ['py36', 'py37', 'py38']
