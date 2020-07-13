@@ -31,7 +31,9 @@ def duration(literal: str) -> float:
     or ``h`` (for hours). If no unit is given, ``s`` is assumed.
     """
     literal = literal.strip()
-    value, unit = (literal, "") if literal.isdigit() else (literal[:-1], literal[-1])
+    value, unit = (
+        (literal, "") if literal[-1].isdigit() else (literal[:-1], literal[-1])
+    )
     try:
         scale = INTERVAL_UNITS[unit]
     except KeyError:
