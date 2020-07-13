@@ -15,8 +15,8 @@ before_script:
   - export COVERAGE_PROCESS_START=$(pwd)/.coveragerc
   - export PYTEST_ADDOPTS=-v
 script:
-  - python -m flake8
-  - python -m black --diff --check cms_perf.py tests
+  - python -m flake8 cms_perf tests
+  - python -m black --diff --check cms_perf tests
   - python -m coverage run -m pytest
 after_success:
   - coverage report && codecov
