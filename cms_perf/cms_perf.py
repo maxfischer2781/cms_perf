@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Sensor for the XRootD cms.perf directive"""
 #   See the https://xrootd.slac.stanford.edu/doc/dev410/cms_config.htm#_Toc8247264
 # The specified program must write 5 white-space separated numbers to standard out.
 # The last number must be terminated by a new-line character ("\n"). Each number must
@@ -15,8 +14,6 @@ import time
 import sys
 
 import psutil
-
-__version__ = "0.2.1"
 
 
 INTERVAL_UNITS = {"": 1, "s": 1, "m": 60, "h": 60 * 60}
