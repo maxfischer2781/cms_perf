@@ -16,7 +16,7 @@ import sys
 
 import psutil
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 
 INTERVAL_UNITS = {"": 1, "s": 1, "m": 60, "h": 60 * 60}
