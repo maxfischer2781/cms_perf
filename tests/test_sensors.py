@@ -12,7 +12,7 @@ SENSORS = (
 )
 
 
-@pytest.mark.parametrize('read_sensor', SENSORS)
+@pytest.mark.parametrize("read_sensor", SENSORS)
 def test_sensors(read_sensor):
     result = read_sensor()
     assert type(result) is float
