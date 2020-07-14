@@ -13,9 +13,7 @@ def capture(command: List[str], num_lines=5) -> List[bytes]:
         output = b"\n".join(itertools.chain(output, process.stdout))
         print(output, file=sys.stderr)
         raise subprocess.CalledProcessError(
-            returncode=process.poll(),
-            cmd=command,
-            output=output,
+            returncode=process.poll(), cmd=command, output=output,
         )
     process.terminate()
     return output
