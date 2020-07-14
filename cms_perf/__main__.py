@@ -1,3 +1,3 @@
-from .cms_perf import main
+from .report import main
 
 main()
