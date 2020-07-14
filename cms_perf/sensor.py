@@ -1,14 +1,11 @@
-#!/usr/bin/env python3
-#   See the https://xrootd.slac.stanford.edu/doc/dev410/cms_config.htm#_Toc8247264
-# The specified program must write 5 white-space separated numbers to standard out.
-# The last number must be terminated by a new-line character ("\n"). Each number must
-# be normalized to 100, with 0 indicating no load and 100 indicating saturation. The
-# numbers are in the order:
-# 1.      system load
-# 2.      cpu utilization
-# 3.      memory utilization
-# 4.      paging load, and
-# 5.      network utilization.
+"""
+Sensors for the canonical cms.perf measurements
+
+.. note::
+
+    The paging load has no canonical meaning anymore.
+    It exists for backwards compatibility but is assumed 0.
+"""
 import time
 
 import psutil

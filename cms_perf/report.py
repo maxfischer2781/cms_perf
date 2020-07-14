@@ -1,3 +1,6 @@
+"""
+The main loop collecting and reporting values
+"""
 import sys
 import time
 
