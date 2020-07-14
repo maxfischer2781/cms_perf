@@ -2,7 +2,7 @@ import sys
 import time
 
 from .cli import CLI
-from .cms_perf import (
+from .sensor import (
     system_load,
     cpu_utilization,
     memory_utilization,
