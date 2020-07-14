@@ -19,4 +19,4 @@ script:
   - python -m black --diff --check cms_perf tests
   - python -m coverage run -m pytest
 after_success:
-  - coverage report && codecov
+  - coverage combine && coverage report && codecov

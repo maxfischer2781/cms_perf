@@ -2,7 +2,7 @@
 source = cms_perf
 branch = TRUE
 cover_pylib = FALSE
-parallel = False
+parallel = True
 
 [report]
 show_missing = True
