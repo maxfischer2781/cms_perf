@@ -12,7 +12,7 @@ before_script:
   - export PYTHONHASHSEED=${PYTHONHASHSEED:-${RANDOM}}
   - echo "export PYTHONHASHSEED=${PYTHONHASHSEED}"
   - pip install .[test]
-  - export COVERAGE_PROCESS_START=$(pwd)/.coveragerc
+  - export COVERAGE_RCFILE=$(pwd)/.coveragerc
   - export PYTEST_ADDOPTS=-v
 script:
   - python -m flake8 cms_perf tests
