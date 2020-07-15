@@ -18,3 +18,19 @@ def test_run_normal(executable: List[str]):
         assert len(readings) == 5
         for reading in readings:
             assert 0 <= int(reading) <= 100
+
+
+@pytest.mark.parametrize("executable", EXECUTABLES)
+def test_run_sched(executable: List[str]):
+    output = capture(
+        [*executable, "--interval", "0.1", "--sched", "runq 100"],
+        num_lines=5,
+        stderr=True,
+    )
+    assert output
+    for line in output:
+        *readings, total = line.split()
+        assert len(readings) == 5
+        for reading in readings:
+            assert 0 <= int(reading) <= 100
+        assert total == readings[0]
