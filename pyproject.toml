@@ -18,7 +18,7 @@ classifiers = [
 requires = ["psutil >=5.6.2"]
 
 [tool.flit.scripts]
-cms_perf = "cms_perf:main"
+cms_perf = "cms_perf.report:main"
 
 [tool.flit.metadata.requires-extra]
 test = [

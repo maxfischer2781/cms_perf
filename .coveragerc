@@ -1,0 +1,18 @@
+[run]
+source = cms_perf
+branch = TRUE
+cover_pylib = FALSE
+parallel = True
+
+[report]
+show_missing = True
+exclude_lines =
+    # default
+    pragma: no cover
+    assert
+    raise NotImplementedError
+    return NotImplemented
+    if __name__ == "__main__"
+    if __name__ == '__main__'
+    @overload
+    if TYPE_CHECKING
