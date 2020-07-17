@@ -25,7 +25,7 @@ class XrootdTracker:
     def _refresh_xrootds(self):
         return (
             not self._xrootd_procs
-            or time.time() > self.rescan_interval
+            or time.time() > self._next_scan
             or not all(proc.is_running() for proc in self._xrootd_procs)
         )
 
