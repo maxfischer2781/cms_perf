@@ -25,6 +25,7 @@ def test_tracker():
 @pytest.mark.skipif(_any_xrootds(), reason="Ambient xrootd processes present")
 def test_tracker_cache_procs():
     tracker = xrd_load.XrootdTracker(rescan_interval=1)
+    assert not tracker.xrootds
     # automatically rescan if there are no target processes
     assert tracker.xrootds is not tracker.xrootds
     with Process("xrootd", threads=20, files=20):
