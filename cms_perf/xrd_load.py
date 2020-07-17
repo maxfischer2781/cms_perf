@@ -7,6 +7,25 @@ import time
 import psutil
 
 
+def rescan(interval):
+    return min(interval * 10, 3600)
+
+
+def prepare_iowait(interval: float):
+    tracker = XrootdTracker(rescan_interval=rescan(interval))
+    return tracker.io_wait
+
+
+def prepare_numfds(interval: float, max_core_fds: float):
+    tracker = XrootdTracker(rescan_interval=rescan(interval))
+    return lambda: tracker.num_fds() / max_core_fds / psutil.cpu_count()
+
+
+def prepare_threads(interval: float, max_core_threads: float):
+    tracker = XrootdTracker(rescan_interval=rescan(interval))
+    return lambda: tracker.num_threads() / max_core_threads / psutil.cpu_count()
+
+
 def is_alive(proc: psutil.Process) -> bool:
     """Test that `proc` is running but not a zombie"""
     return proc.is_running() and proc.status() != psutil.STATUS_ZOMBIE

@@ -1,5 +1,7 @@
 import argparse
 
+from . import xrd_load
+
 
 INTERVAL_UNITS = {"": 1, "s": 1, "m": 60, "h": 60 * 60}
 
@@ -55,4 +57,46 @@ CLI.add_argument(
     "--sched",
     help="cms.sched directive to report total load and maxload on stderr",
     type=str,
+)
+CLI.set_defaults(__make_pag__=lambda args: lambda: 0)
+
+CLI_PAG = CLI.add_subparsers(
+    title="pag plugins", description="Sensor to use for the pag measurement",
+)
+
+
+# pag XRootD Plugins
+CLI_PAG_XIOWAIT = CLI_PAG.add_parser(
+    "pag=xrootd.io_wait", help="Relative time waiting for I/O by all xrootd processes",
+)
+CLI_PAG_XIOWAIT.set_defaults(
+    __make_pag__=lambda args: xrd_load.prepare_iowait(args.interval)
+)
+
+CLI_PAG_XNUMFDS = CLI_PAG.add_parser(
+    "pag=xrootd.num_fds", help="Open file handles of all xrootd processes",
+)
+CLI_PAG_XNUMFDS.add_argument(
+    "--max-core-xfds",
+    default=1,
+    help="Maximum open file handles per core considered 100%%",
+    type=float,
+)
+CLI_PAG_XNUMFDS.set_defaults(
+    __make_pag__=lambda args: xrd_load.prepare_numfds(args.interval, args.max_core_xfds)
+)
+
+CLI_PAG_XTHREADS = CLI_PAG.add_parser(
+    "pag=xrootd.num_threads", help="Threads of all xrootd processes",
+)
+CLI_PAG_XTHREADS.add_argument(
+    "--max-core-xthreads",
+    default=1,
+    help="Maximum threads per core considered 100%%",
+    type=float,
+)
+CLI_PAG_XNUMFDS.set_defaults(
+    __make_pag__=lambda args: xrd_load.prepare_threads(
+        args.interval, args.max_core_xthreads
+    )
 )
