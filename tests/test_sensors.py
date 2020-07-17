@@ -16,4 +16,4 @@ SENSORS = (
 def test_sensors(read_sensor):
     result = read_sensor()
     assert type(result) is float
-    assert 0.0 <= result <= 100.0
+    assert 0.0 <= result
