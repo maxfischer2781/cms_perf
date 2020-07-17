@@ -27,6 +27,7 @@ test = [
     "flake8",
     "flake8-bugbear",
     "black",
+    "setproctitle",
 ]
 
 [tool.black]
