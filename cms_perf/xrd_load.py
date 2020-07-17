@@ -9,7 +9,7 @@ import psutil
 
 def is_alive(proc: psutil.Process) -> bool:
     """Test that `proc` is running but not a zombie"""
-    return proc.is_running() and proc.status() == psutil.STATUS_RUNNING
+    return proc.is_running() and proc.status() != psutil.STATUS_ZOMBIE
 
 
 class XrootdTracker:
