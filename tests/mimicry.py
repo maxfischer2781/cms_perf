@@ -13,6 +13,12 @@ import signal
 import platform
 
 import setproctitle
+import pytest
+
+
+skipif_unsuported = pytest.mark.skipif(
+    platform.system() != "Linux", reason="Cannot mimic on this OS"
+)
 
 
 class Process:
