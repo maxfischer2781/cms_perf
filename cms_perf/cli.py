@@ -95,7 +95,7 @@ CLI_PAG_XTHREADS.add_argument(
     help="Maximum threads per core considered 100%%",
     type=float,
 )
-CLI_PAG_XNUMFDS.set_defaults(
+CLI_PAG_XTHREADS.set_defaults(
     __make_pag__=lambda args: xrd_load.prepare_threads(
         args.interval, args.max_core_xthreads
     )
