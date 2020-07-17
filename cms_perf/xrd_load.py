@@ -7,6 +7,11 @@ import time
 import psutil
 
 
+def is_alive(proc: psutil.Process) -> bool:
+    """Test that `proc` is running but not a zombie"""
+    return proc.is_running() and proc.status() == psutil.STATUS_RUNNING
+
+
 class XrootdTracker:
     def __init__(self, rescan_interval: float):
         self.rescan_interval = rescan_interval
@@ -17,7 +22,9 @@ class XrootdTracker:
     def xrootds(self) -> List[psutil.Process]:
         if self._refresh_xrootds():
             self._xrootd_procs = [
-                proc for proc in psutil.process_iter() if proc.name() == "xrootd"
+                proc
+                for proc in psutil.process_iter()
+                if proc.name() == "xrootd" and is_alive(proc)
             ]
             self._next_scan = time.time() + self.rescan_interval
         return self._xrootd_procs
@@ -26,7 +33,7 @@ class XrootdTracker:
         return (
             not self._xrootd_procs
             or time.time() > self._next_scan
-            or not all(proc.is_running() for proc in self._xrootd_procs)
+            or not all(is_alive(proc) for proc in self._xrootd_procs)
         )
 
     def io_wait(self) -> float:
