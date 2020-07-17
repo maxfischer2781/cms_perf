@@ -46,7 +46,14 @@ PAG_PLUGINS = ["xrootd.io_wait", "xrootd.num_fds", "xrootd.num_threads"]
 def test_run_pag_plugin(executable: List[str], pag_plugin):
     with mimicry.Process(name="xrootd", threads=20, files=20):
         output = capture(
-            [*executable, "--interval", "0.1", "--sched", "runq 100", f"pag={pag_plugin}"],
+            [
+                *executable,
+                "--interval",
+                "0.1",
+                "--sched",
+                "runq 100",
+                f"pag={pag_plugin}",
+            ],
             num_lines=5,
             stderr=True,
         )
