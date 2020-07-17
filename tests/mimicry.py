@@ -22,6 +22,7 @@ class Process:
     This class must be used as a context manager. The process is created on entering
     the context and gracefully closed on exiting it.
     """
+
     def __init__(
         self, name: str, threads: int = 1, files: int = 0, lifetime: float = 1.0
     ):
@@ -35,7 +36,7 @@ class Process:
 
     def __enter__(self):
         with tempfile.TemporaryDirectory() as rendezvous_dir:
-            rendezvous = os.path.join(rendezvous_dir, '__it_lives__')
+            rendezvous = os.path.join(rendezvous_dir, "__it_lives__")
             os.mkfifo(rendezvous)
             self._process = subprocess.Popen(
                 [
@@ -48,7 +49,7 @@ class Process:
                     rendezvous,
                 ]
             )
-            with open(rendezvous, 'r') as ready:
+            with open(rendezvous, "r") as ready:
                 ready.read()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -68,8 +69,8 @@ def mimimain():
     with contextlib.ExitStack() as es:
         for _ in range(int(files)):
             es.enter_context(tempfile.TemporaryFile())
-        with open(rendezvous, 'w') as ready:
-            ready.write('ready')
+        with open(rendezvous, "w") as ready:
+            ready.write("ready")
         try:
             for _ in range(int((float(lifetime)) * 100)):
                 time.sleep(0.01)
