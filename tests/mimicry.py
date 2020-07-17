@@ -54,6 +54,7 @@ class Process:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._process.send_signal(signal.SIGINT)
+        self._process.wait()
 
 
 def add_thread():
