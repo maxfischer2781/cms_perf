@@ -7,33 +7,6 @@ import time
 import psutil
 
 
-def _rescan(interval):
-    return min(interval * 10, 60 * 60)
-
-
-def xrootd_iowait(interval):
-    tracker = XrootdTracker(rescan_interval=_rescan(interval))
-    return tracker.io_wait
-
-
-def xrootd_num_fds(interval, max_fds: int):
-    tracker = XrootdTracker(rescan_interval=_rescan(interval))
-
-    def scaled_num_fds():
-        return tracker.num_fds() / max_fds
-
-    return scaled_num_fds
-
-
-def xrootd_threads(interval, max_threads: int):
-    tracker = XrootdTracker(rescan_interval=_rescan(interval))
-
-    def scaled_num_threads():
-        return tracker.num_fds() / max_threads
-
-    return scaled_num_threads
-
-
 class XrootdTracker:
     def __init__(self, rescan_interval: float):
         self.rescan_interval = rescan_interval
