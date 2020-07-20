@@ -64,7 +64,9 @@ def clamp_percentages(value: float) -> int:
     return 0 if value < 0.0 else 100 if value > 100.0 else int(value)
 
 
-def run_forever(max_core_runq: float, interval: float, sched: PseudoSched = None):
+def run_forever(
+    max_core_runq: float, interval: float, pag_sensor, sched: PseudoSched = None
+):
     """Write sensor information to stdout every ``interval`` seconds"""
     try:
         for _ in every(interval):
@@ -74,7 +76,7 @@ def run_forever(max_core_runq: float, interval: float, sched: PseudoSched = None
                     system_load(interval) / max_core_runq,
                     cpu_utilization(interval),
                     memory_utilization(),
-                    0,
+                    pag_sensor(),
                     network_utilization(interval),
                 ),
             )
@@ -96,6 +98,10 @@ def main():
     """Run the sensor based on CLI arguments"""
     options = CLI.parse_args()
     sched = PseudoSched.from_directive(options.sched) if options.sched else None
+    pag_sensor = options.__make_pag__(options)
     run_forever(
-        max_core_runq=options.max_core_runq, interval=options.interval, sched=sched
+        max_core_runq=options.max_core_runq,
+        interval=options.interval,
+        pag_sensor=pag_sensor,
+        sched=sched,
     )

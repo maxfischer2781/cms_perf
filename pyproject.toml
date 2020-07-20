@@ -26,7 +26,8 @@ test = [
     "codecov",
     "flake8",
     "flake8-bugbear",
-    "black; implementation_name=='cpython'",
+    "black",
+    "setproctitle",
 ]
 
 [tool.black]
