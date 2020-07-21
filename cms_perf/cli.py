@@ -80,6 +80,7 @@ CLI_PAG_NUMSOCK.add_argument(
     "--socket-kind",
     help="Which sockets to count",
     choices=list(net_load.ConnectionKind.__members__),
+    default='tcp',
 )
 CLI_PAG_NUMSOCK.set_defaults(
     __make_pag__=lambda args: net_load.prepare_num_sockets(
