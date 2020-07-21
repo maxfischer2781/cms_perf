@@ -37,7 +37,7 @@ def test_run_sched(executable: List[str]):
         assert total == readings[0]
 
 
-PAG_PLUGINS = ["xrootd.io_wait", "xrootd.num_fds", "xrootd.num_threads"]
+PAG_PLUGINS = ["num_sockets", "xrootd.io_wait", "xrootd.num_fds", "xrootd.num_threads"]
 
 
 @mimicry.skipif_unsuported
