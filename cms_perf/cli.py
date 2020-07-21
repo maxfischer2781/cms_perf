@@ -74,7 +74,10 @@ CLI_PAG_NUMSOCK = CLI_PAG.add_parser(
     "pag=num_sockets", help="Total sockets across all processes",
 )
 CLI_PAG_NUMSOCK.add_argument(
-    "--max-sockets", help="Maximum total sockets considered 100%%"
+    "--max-sockets",
+    default=1000,
+    help="Maximum total sockets considered 100%%",
+    type=int,
 )
 CLI_PAG_NUMSOCK.add_argument(
     "--socket-kind",
