@@ -1,6 +1,7 @@
 import argparse
 
 from . import xrd_load
+from . import __version__ as lib_version
 
 
 INTERVAL_UNITS = {"": 1, "s": 1, "m": 60, "h": 60 * 60}
@@ -40,6 +41,9 @@ CLI = argparse.ArgumentParser(
         "The paging load exists for historical reasons; "
         "it cannot be reliably computed."
     ),
+)
+CLI.add_argument(
+    "--version", action="version", version=lib_version,
 )
 CLI.add_argument(
     "--max-core-runq",
