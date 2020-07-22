@@ -21,7 +21,7 @@ class ConnectionKind(enum.Enum):
 
 
 def prepare_num_sockets(kind: ConnectionKind, max_sockets):
-    return lambda: num_sockets(kind) / max_sockets
+    return lambda: 100.0 * num_sockets(kind) / max_sockets
 
 
 def num_sockets(kind: ConnectionKind) -> float:
