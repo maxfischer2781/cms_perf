@@ -13,17 +13,17 @@ def rescan(interval):
 
 def prepare_iowait(interval: float):
     tracker = XrootdTracker(rescan_interval=rescan(interval))
-    return tracker.io_wait
+    return lambda: 100.0 * tracker.io_wait()
 
 
 def prepare_numfds(interval: float, max_core_fds: float):
     tracker = XrootdTracker(rescan_interval=rescan(interval))
-    return lambda: tracker.num_fds() / max_core_fds / psutil.cpu_count()
+    return lambda: 100.0 * tracker.num_fds() / max_core_fds / psutil.cpu_count()
 
 
 def prepare_threads(interval: float, max_core_threads: float):
     tracker = XrootdTracker(rescan_interval=rescan(interval))
-    return lambda: tracker.num_threads() / max_core_threads / psutil.cpu_count()
+    return lambda: 100.0 * tracker.num_threads() / max_core_threads / psutil.cpu_count()
 
 
 def is_alive(proc: psutil.Process) -> bool:

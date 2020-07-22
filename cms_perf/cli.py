@@ -1,6 +1,7 @@
 import argparse
 
 from . import xrd_load
+from . import net_load
 from . import __version__ as lib_version
 
 
@@ -68,6 +69,27 @@ CLI_PAG = CLI.add_subparsers(
     title="pag plugins", description="Sensor to use for the pag measurement",
 )
 
+# pag System Plugins
+CLI_PAG_NUMSOCK = CLI_PAG.add_parser(
+    "pag=num_sockets", help="Total sockets across all processes",
+)
+CLI_PAG_NUMSOCK.add_argument(
+    "--max-sockets",
+    default=1000,
+    help="Maximum total sockets considered 100%%",
+    type=int,
+)
+CLI_PAG_NUMSOCK.add_argument(
+    "--socket-kind",
+    help="Which sockets to count",
+    choices=list(net_load.ConnectionKind.__members__),
+    default="tcp",
+)
+CLI_PAG_NUMSOCK.set_defaults(
+    __make_pag__=lambda args: net_load.prepare_num_sockets(
+        net_load.ConnectionKind.__getitem__(args.socket_kind), args.max_sockets
+    )
+)
 
 # pag XRootD Plugins
 CLI_PAG_XIOWAIT = CLI_PAG.add_parser(
