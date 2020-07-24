@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 import sys
 
 import pytest
@@ -21,10 +21,15 @@ def test_run_normal(executable: List[str]):
             assert 0 <= int(reading) <= 100
 
 
+SCHED_FIELD = tuple(enumerate(("runq", "cpu", "mem", "pag", "io")))
+
+
 @pytest.mark.parametrize("executable", EXECUTABLES)
-def test_run_sched(executable: List[str]):
+@pytest.mark.parametrize("sched_field", SCHED_FIELD)
+def test_run_sched(executable: List[str], sched_field: Tuple[int, str]):
+    index, field = sched_field
     output = capture(
-        [*executable, "--interval", "0.1", "--sched", "runq 100"],
+        [*executable, "--interval", "0.1", "--sched", f"{field} 100"],
         num_lines=5,
         stderr=True,
     )
@@ -34,7 +39,7 @@ def test_run_sched(executable: List[str]):
         assert len(readings) == 5
         for reading in readings:
             assert 0 <= int(reading) <= 100
-        assert total == readings[0]
+        assert total == readings[index]
 
 
 PAG_PLUGINS = ["num_sockets", "xrootd.io_wait", "xrootd.num_fds", "xrootd.num_threads"]
