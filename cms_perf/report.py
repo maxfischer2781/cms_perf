@@ -35,14 +35,20 @@ class PseudoSched:
         }
         return cls(**policy)
 
-    def weight(self, runq: float, cpu: float, mem: float, paq, io: float):
+    def weight(self, runq: int, cpu: int, mem: int, pag: int, io: int):
         """
         Rate the total load by weighting each individual load value
 
         Returns the total load and whether the load exceeds the ``maxload``.
         """
-        load = (cpu * self.cpu + io * self.io + mem * self.mem + runq * self.runq) / 100
-        return int(load), load > self.maxload
+        load = (
+            cpu * self.cpu
+            + io * self.io
+            + mem * self.mem
+            + pag * self.pag
+            + runq * self.runq
+        ) // 100
+        return load, load > self.maxload
 
 
 def every(interval: float):
