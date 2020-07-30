@@ -1,4 +1,4 @@
-from typing import TypeVar, Callable, Optional, Dict, NamedTuple, List
+from typing import TypeVar, Optional, Dict, NamedTuple, List
 from typing_extensions import Protocol
 import functools
 import inspect
