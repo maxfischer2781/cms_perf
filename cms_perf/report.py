@@ -74,18 +74,21 @@ def run_forever(
     max_core_runq: float, interval: float, pag_sensor, sched: PseudoSched = None
 ):
     """Write sensor information to stdout every ``interval`` seconds"""
+    base_sensors = (
+        system_load(interval),
+        cpu_utilization(interval),
+        memory_utilization(interval),
+        network_utilization(interval),
+    )
+    sensors = (
+        lambda: base_sensors[0]() / max_core_runq,
+        *base_sensors[1:3],
+        pag_sensor,
+        base_sensors[3],
+    )
     try:
         for _ in every(interval):
-            (*values,) = map(
-                clamp_percentages,
-                (
-                    system_load(interval) / max_core_runq,
-                    cpu_utilization(interval),
-                    memory_utilization(),
-                    pag_sensor(),
-                    network_utilization(interval),
-                ),
-            )
+            (*values,) = map(clamp_percentages, map(lambda x: x(), sensors,),)
             print(*values, end="", flush=True)
             if sched is not None:
                 load, rejected = sched.weight(*values)
