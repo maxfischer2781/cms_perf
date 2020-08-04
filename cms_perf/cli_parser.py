@@ -82,16 +82,20 @@ def compile_call(call_name: str, arity: int, transpiled_name: Optional[str] = No
     return (call_defaults,)
 
 
-def cli_sensor(call: Optional[SF] = None, *, name: Optional[str] = None):
+def cli_sensor(name: Optional[str] = None):
     """
     Register a sensor factory for the CLI with its own name or ``name``
     """
-    if call is None:
-        return functools.partial(cli_sensor, name=name)
-    return _cli_sensor(call, name)
+    assert not callable(name), "cli_sensor must be called before decorating"
+
+    def register(call: SF):
+        _register_cli_sensor(call, name)
+        return call
+
+    return register
 
 
-def _cli_sensor(call: SF, cli_name: Optional[str] = None) -> SF:
+def _register_cli_sensor(call: SF, cli_name: Optional[str] = None) -> SF:
     cli_name = cli_name if cli_name is not None else call.__name__
     source_name = cli_name.replace(".", "_")
     assert source_name not in SENSORS, f"cannot re-register sensor {source_name}"

@@ -4,7 +4,7 @@ from cms_perf import cli_parser
 from cms_perf import sensor
 
 
-@cli_parser.cli_sensor
+@cli_parser.cli_sensor()
 def fake_sensor_factory(interval: int, value=1):
     return lambda: value
 
