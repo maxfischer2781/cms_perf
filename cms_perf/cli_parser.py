@@ -105,7 +105,7 @@ def _cli_sensor(call: SF, cli_name: Optional[str] = None) -> SF:
     ), "sensor factories may only take regular parameters"
     cli_parameters = list(
         itertools.dropwhile(lambda param: param != "interval", raw_parameters)
-    )
+    )[1:]
     SENSORS[source_name] = SFInfo(call, cli_name, cli_parameters)
     GENERATED << pp.MatchFirst(
         (
