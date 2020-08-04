@@ -12,6 +12,6 @@ SENSORS = (
 
 @pytest.mark.parametrize("read_sensor", SENSORS)
 def test_sensors(read_sensor):
-    result = read_sensor(interval=0.01)()
+    result = read_sensor(interval=0.01)
     assert type(result) is float
     assert 0.0 <= result

@@ -6,12 +6,12 @@ from cms_perf import sensor
 
 @cli_parser.cli_sensor()
 def fake_sensor_factory(interval: int, value=1):
-    return lambda: value
+    return value
 
 
 @cli_parser.cli_sensor(name="fake.sensor")
 def fake_aliased_sensor_factory(interval: int, value=1):
-    return lambda: value
+    return value
 
 
 SOURCES = [

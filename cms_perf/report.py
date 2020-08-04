@@ -3,6 +3,7 @@ The main loop collecting and reporting values
 """
 import sys
 import time
+from functools import partial
 
 from .cli import CLI
 from .sensor import (
@@ -75,10 +76,10 @@ def run_forever(
 ):
     """Write sensor information to stdout every ``interval`` seconds"""
     base_sensors = (
-        system_load(interval),
-        cpu_utilization(interval),
-        memory_utilization(interval),
-        network_utilization(interval),
+        partial(system_load, interval),
+        partial(cpu_utilization, interval),
+        partial(memory_utilization, interval),
+        partial(network_utilization, interval),
     )
     sensors = (
         lambda: base_sensors[0]() / max_core_runq,
