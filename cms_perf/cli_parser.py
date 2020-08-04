@@ -22,12 +22,16 @@ def transpile(result: pp.ParseResults) -> str:
 
 # Mathematical Operators
 def transpile_binop(result: pp.ParseResults):
-    lhs, operator, rhs = result[0]
-    return f"({lhs} {operator} {rhs})"
+    (*terms,) = result[0]
+    return f"({' '.join(terms)})"
 
 
 EXPRESSION = pp.infixNotation(
-    (NUMBER | GENERATED), [(pp.oneOf("+ * - /"), 2, pp.opAssoc.LEFT, transpile_binop)]
+    (NUMBER | GENERATED),
+    [
+        (pp.oneOf(operators), 2, pp.opAssoc.LEFT, transpile_binop)
+        for operators in ("* /", "+ -")
+    ],
 )
 
 
