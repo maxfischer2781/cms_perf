@@ -6,20 +6,20 @@ from cms_perf import sensor
 
 @cli_parser.cli_sensor
 def fake_sensor_factory(interval: int, value=1):
-    return value
+    return lambda: value
 
 
 @cli_parser.cli_sensor(name="fake.sensor")
 def fake_aliased_sensor_factory(interval: int, value=1):
-    return value
+    return lambda: value
 
 
 SOURCES = [
     "1.0",
     "1337",
-    *cli_parser.SENSORS,
+    *(sensor.cli_name for sensor in cli_parser.SENSORS.values()),
     "1.0 / 1337",
-    *(f"{sensor} / 20" for sensor in cli_parser.SENSORS),
+    *(f"{sensor.cli_name} / 20" for sensor in cli_parser.SENSORS.values()),
 ]
 
 

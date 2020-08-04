@@ -44,11 +44,12 @@ class SensorFactory(Protocol):
 
 class SFInfo(NamedTuple):
     factory: SensorFactory
+    cli_name: str
     cli_signature: List[str]
 
 
 SF = TypeVar("SF", bound=SensorFactory)
-SENSORS: Dict[str, SFInfo] = {}
+SENSORS: Dict[str, SFInfo] = {}  # transpiled_name => SFInfo
 
 
 def compile_call(call_name: str, arity: int, transpiled_name: Optional[str] = None):
@@ -86,13 +87,14 @@ def cli_sensor(call: Optional[SF] = None, *, name: Optional[str] = None):
     return _cli_sensor(call, name)
 
 
-def _cli_sensor(call: SF, name: Optional[str] = None) -> SF:
-    name = name if name is not None else call.__name__
-    assert name not in SENSORS, f"cannot re-register sensor {name}"
+def _cli_sensor(call: SF, cli_name: Optional[str] = None) -> SF:
+    cli_name = cli_name if cli_name is not None else call.__name__
+    source_name = cli_name.replace(".", "_")
+    assert source_name not in SENSORS, f"cannot re-register sensor {source_name}"
     raw_parameters = inspect.signature(call).parameters
     assert (
         "interval" in raw_parameters
-    ), f"sensor factory {name!r} must accept an 'interval'"
+    ), f"sensor factory {cli_name!r} must accept an 'interval'"
     assert all(
         param.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
         for param in raw_parameters.values()
@@ -100,11 +102,11 @@ def _cli_sensor(call: SF, name: Optional[str] = None) -> SF:
     cli_parameters = list(
         itertools.dropwhile(lambda param: param != "interval", raw_parameters)
     )
-    SENSORS[name] = SFInfo(call, cli_parameters)
+    SENSORS[source_name] = SFInfo(call, cli_name, cli_parameters)
     GENERATED << pp.MatchFirst(
         (
             *(GENERATED.expr.exprs if GENERATED.expr else ()),
-            *compile_call(name, len(cli_parameters)),
+            *compile_call(cli_name, len(cli_parameters), source_name),
         )
     )
     return call
