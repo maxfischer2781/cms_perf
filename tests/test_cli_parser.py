@@ -45,3 +45,15 @@ def test_known_sensor(expected: float, source: str):
     factory = cli_parser.prepare_sensor(source)
     (sensor,) = cli_parser.compile_sensors(0.01, factory)
     assert expected == sensor()
+
+
+KNOWN_SENSOR_CALLS = [
+    (2, "fake_sensor_factory(2)"),
+]
+
+
+@pytest.mark.parametrize("expected, source", KNOWN_SENSOR_CALLS)
+def test_known_sensor_calls(expected: float, source: str):
+    factory = cli_parser.prepare_sensor(source)
+    (sensor,) = cli_parser.compile_sensors(0.01, factory)
+    assert expected == sensor()
