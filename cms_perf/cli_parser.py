@@ -16,6 +16,8 @@ import inspect
 
 import pyparsing as pp
 
+pp.ParserElement.enablePackrat()
+
 
 # Auto-generated expressions
 GENERATED = pp.Forward()
@@ -185,8 +187,9 @@ def parse_sensor(
     source: str, name: Optional[str] = None
 ) -> Callable[..., Callable[[], float]]:
     name = name if name is not None else f"<cms_perf.cli_parser code {source!r}>"
-    free_variables = ", ".join(SENSORS.keys() | TRANSFORMS.keys())
     py_source = parse(source)
+    pp.ParserElement.resetCache()  # free parser cache
+    free_variables = ", ".join(SENSORS.keys() | TRANSFORMS.keys())
     code = compile(
         f"lambda interval, {free_variables}: lambda: {py_source}",
         filename=name,
