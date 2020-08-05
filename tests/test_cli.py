@@ -12,7 +12,7 @@ EXECUTABLES = ["cms_perf"], [sys.executable, "-m", "coverage", "run", "-m", "cms
 
 @pytest.mark.parametrize("executable", EXECUTABLES)
 def test_run_normal(executable: List[str]):
-    output = capture([*executable, "--interval", "0.1"], num_lines=5)
+    output = capture([*executable, "--interval", "0.02"], num_lines=5)
     assert output
     for line in output:
         readings = line.split()
@@ -29,7 +29,7 @@ SCHED_FIELD = tuple(enumerate(("runq", "cpu", "mem", "pag", "io")))
 def test_run_sched(executable: List[str], sched_field: Tuple[int, str]):
     index, field = sched_field
     output = capture(
-        [*executable, "--interval", "0.1", "--sched", f"{field} 100"],
+        [*executable, "--interval", "0.02", "--sched", f"{field} 100"],
         num_lines=5,
         stderr=True,
     )
