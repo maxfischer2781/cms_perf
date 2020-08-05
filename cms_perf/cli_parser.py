@@ -60,7 +60,7 @@ def compile_call(
     call_defaults = pp.Suppress(call_name)
 
     @call_defaults.setParseAction
-    def transpile(result: pp.ParseResults) -> str:
+    def transpile_no_args(result: pp.ParseResults) -> str:
         parameters = ", ".join(extra_args)
         return f"{transpiled_name}({parameters})"
 
@@ -73,7 +73,7 @@ def compile_call(
         )
 
         @call_params.setParseAction
-        def transpile(result: pp.ParseResults) -> str:
+        def transpile_with_args(result: pp.ParseResults) -> str:
             parameters = ", ".join(extra_args + tuple(result))
             return f"{transpiled_name}({parameters})"
 

@@ -1,7 +1,7 @@
 import pytest
 
 from cms_perf import cli_parser
-from cms_perf import sensor
+from cms_perf import sensor as _mounted_sensors  # noqa
 
 
 @cli_parser.cli_sensor()
@@ -49,6 +49,7 @@ def test_known_sensor(expected: float, source: str):
 
 KNOWN_SENSOR_CALLS = [
     (2, "fake_sensor_factory(2)"),
+    (6, "fake_sensor_factory(4) / fake_sensor_factory(2) * fake_sensor_factory(3)"),
 ]
 
 
