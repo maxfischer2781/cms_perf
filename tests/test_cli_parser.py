@@ -19,6 +19,7 @@ SOURCES = [
     "1337",
     *(sensor.cli_name for sensor in cli_parser.SENSORS.values()),
     "1.0 / 1337",
+    "100.0*loadq/ncores",
     *(f"{sensor.cli_name} / 20" for sensor in cli_parser.SENSORS.values()),
 ]
 

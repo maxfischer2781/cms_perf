@@ -1,6 +1,7 @@
 import argparse
 
 from . import cli_parser
+from . import sensor  # noqa  # ensure sensors are loaded
 from . import xrd_load
 from . import net_load
 from . import __version__ as lib_version
