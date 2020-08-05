@@ -34,6 +34,8 @@ def test_run_replaced(executable: List[str]):
             "1",
             "--pmem",
             "2",
+            "--pag",
+            "3",
             "--pio",
             "4",
         ],
@@ -43,13 +45,8 @@ def test_run_replaced(executable: List[str]):
     for line in output:
         readings = line.split()
         assert len(readings) == 5
-        for reading in readings:
-            assert 0 <= int(reading) <= 100
-        assert int(readings[0]) == 0
-        assert int(readings[1]) == 1
-        assert int(readings[2]) == 2
-        assert int(readings[3]) == 0  # pag
-        assert int(readings[4]) == 4
+        for idx, reading in enumerate(readings):
+            assert idx == int(reading)
 
 
 SCHED_FIELD = tuple(enumerate(("runq", "cpu", "mem", "pag", "io")))
