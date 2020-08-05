@@ -2,12 +2,14 @@ from typing import List, Tuple
 import sys
 
 import pytest
+import coverage
 
 from .utility import capture
 from . import mimicry
 
-
-EXECUTABLES = ["cms_perf"], [sys.executable, "-m", "coverage", "run", "-m", "cms_perf"]
+EXECUTABLES = ["cms_perf"], [sys.executable, "-m", "cms_perf"]
+if coverage.Coverage.current() is not None:
+    EXECUTABLES += ([sys.executable, "-m", "coverage", "run", "-m", "cms_perf"],)
 
 
 @pytest.mark.parametrize("executable", EXECUTABLES)
