@@ -5,7 +5,10 @@ import enum
 
 import psutil
 
+from .cli_parser import cli_domain
 
+
+@cli_domain("KIND")
 class ConnectionKind(enum.Enum):
     inet = enum.auto()
     inet4 = enum.auto()

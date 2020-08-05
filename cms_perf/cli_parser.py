@@ -10,9 +10,10 @@ and everything compiles down to Python source code.
 The math part is an explicitly defined.
 Both calls and constants are automatically generated from Python objects.
 """
-from typing import TypeVar, Optional, Dict, NamedTuple, List, Callable
+from typing import TypeVar, Optional, Dict, NamedTuple, List, Callable, Type
 from typing_extensions import Protocol
 import inspect
+import enum
 
 import pyparsing as pp
 
@@ -20,7 +21,7 @@ pp.ParserElement.enablePackrat()
 
 
 # Auto-generated expressions
-GENERATED = pp.Forward()
+GENERATED = pp.Forward().setName("TERM")
 
 
 # Number literals – float should be precise enough for everything
@@ -44,6 +45,10 @@ EXPRESSION = pp.infixNotation(
         (pp.oneOf(operators), 2, pp.opAssoc.LEFT, transpile_binop)
         for operators in ("* /", "+ -")
     ],
+).setName(
+    "(NUMBER | TERM | EXPRESSION), "
+    '[ ("*" | "/" | "+" | "-"), '
+    "(NUMBER | TERM | EXPRESSION)]"
 )
 
 
@@ -80,15 +85,29 @@ class CallInfo(NamedTuple):
     cli_name: str
 
 
+class DomainInfo(NamedTuple):
+    domain: type
+    cli_name: str
+    parser: pp.ParserElement
+
+
 # transpiled_name => CallInfo
 KNOWN_CALLABLES: Dict[str, CallInfo] = {}
+KNOWN_DOMAINS: Dict[str, DomainInfo] = {}
 
 
 # automatic parser generation
+def _extend_generated(*rules, base=GENERATED):
+    base << pp.MatchFirst((*(base.expr.exprs if base.expr else ()), *rules))
+
+
 _COMPILEABLE_PARAMETERS = (
     inspect.Parameter.POSITIONAL_OR_KEYWORD,
     inspect.Parameter.VAR_POSITIONAL,
 )
+
+LEFT_PAR = pp.Suppress("(").setName('"("')
+RIGHT_PAR = pp.Suppress(")").setName('")"')
 
 
 def _compile_cli_call(call_name: str, transpiled_name: str, call: Callable):
@@ -123,7 +142,7 @@ def _compile_cli_call(call_name: str, transpiled_name: str, call: Callable):
                 argument_parsers.append(EXPRESSION)
             else:
                 argument_parsers.append(pp.Optional(pp.delimitedList(EXPRESSION)))
-        signature = pp.And((pp.Suppress("("), *argument_parsers, pp.Suppress(")")))
+        signature = pp.And((LEFT_PAR, *argument_parsers, RIGHT_PAR))
         parameter_call = pp.Suppress(call_name) + signature
 
         @parameter_call.setParseAction
@@ -156,13 +175,45 @@ def _register_cli_callable(call: S, cli_name: Optional[str]) -> S:
         source_name not in KNOWN_CALLABLES
     ), f"cannot re-register CLI callable {source_name}"
     KNOWN_CALLABLES[source_name] = CallInfo(call, cli_name)
-    GENERATED << pp.MatchFirst(
-        (
-            *(GENERATED.expr.exprs if GENERATED.expr else ()),
-            *_compile_cli_call(cli_name, source_name, call,),
-        )
-    )
+    _extend_generated(*_compile_cli_call(cli_name, source_name, call))
     return call
+
+
+TP = TypeVar("TP", bound=type)
+
+
+def cli_domain(name: Optional[str] = None):
+    """
+    Register a value domain for the CLI displayed with its own name or ``name``
+    """
+
+    def register(domain: TP) -> TP:
+        if issubclass(domain, enum.Enum):
+            _register_enum(domain, name)
+        else:
+            raise TypeError(f"Cannot register CLI domain: {domain}")
+        return domain
+
+    return register
+
+
+def _register_enum(domain: enum.Enum, cli_name: Optional[str]):
+    cli_name = cli_name if cli_name is not None else domain.__name__
+    source_name = cli_name.replace(".", "_")
+    assert (
+        source_name not in KNOWN_DOMAINS
+    ), f"cannot re-register CLI domain {source_name}"
+    cases = sorted(domain.__members__, reverse=True)
+    match_case = pp.MatchFirst(tuple(map(pp.Keyword, cases))).setName(
+        " | ".join(f'"{case}"' for case in cases)
+    )
+
+    @match_case.setParseAction
+    def transpile_enum_case(result: pp.ParseResults):
+        (case,) = result
+        return f"{source_name}['{case}']"
+
+    KNOWN_DOMAINS[source_name] = DomainInfo(Type[domain], cli_name, match_case)
 
 
 # digesting of CLI information
@@ -197,3 +248,14 @@ def maximum(*operands):
 @cli_call(name="min")
 def minimum(*operands):
     return min(operands)
+
+
+if __name__ == "__main__":
+    # provide debug information on the parser
+    from . import sensor, net_load, xrd_load  # noqa
+    from . import cli_parser  # noqa
+
+    print("EXPRESSION:", cli_parser.EXPRESSION)
+    print("TERM:", cli_parser.GENERATED.expr)
+    for domain in cli_parser.KNOWN_DOMAINS.values():
+        print(f"{domain.cli_name}: {domain.parser}")
