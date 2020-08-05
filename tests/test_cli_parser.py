@@ -58,3 +58,16 @@ def test_known_sensor_calls(expected: float, source: str):
     factory = cli_parser.prepare_sensor(source)
     (sensor,) = cli_parser.compile_sensors(0.01, factory)
     assert expected == sensor()
+
+
+KNOWN_TRANSFORMS = [
+    (12.3, "max(1, 12.3)"),
+    (2, "max(min(2, 4), 1)"),
+]
+
+
+@pytest.mark.parametrize("expected, source", KNOWN_TRANSFORMS)
+def test_known_transforms(expected: float, source: str):
+    factory = cli_parser.prepare_sensor(source)
+    (sensor,) = cli_parser.compile_sensors(0.01, factory)
+    assert expected == sensor()
