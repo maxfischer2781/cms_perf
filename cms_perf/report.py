@@ -4,16 +4,9 @@ The main loop collecting and reporting values
 from typing import Callable
 import sys
 import time
-from functools import partial
 
 from .cli import CLI
 from . import cli_parser
-from .sensor import (
-    system_runq,
-    cpu_utilization,
-    memory_utilization,
-    network_utilization,
-)
 
 
 class PseudoSched:
