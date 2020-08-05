@@ -6,24 +6,44 @@ import time
 
 import psutil
 
+from .cli_parser import cli_sensor
+
 
 def rescan(interval):
     return min(interval * 10, 3600)
 
 
-def prepare_iowait(interval: float):
-    tracker = XrootdTracker(rescan_interval=rescan(interval))
-    return lambda: 100.0 * tracker.io_wait()
+@cli_sensor(name="xrd.piowait")
+def xrd_piowait(interval: float) -> float:
+    """Percentage of time waiting for IO by all XRootD processes"""
+    tracker = cached_tracker(interval)
+    return 100.0 * tracker.io_wait()
 
 
-def prepare_numfds(interval: float, max_core_fds: float):
-    tracker = XrootdTracker(rescan_interval=rescan(interval))
-    return lambda: 100.0 * tracker.num_fds() / max_core_fds / psutil.cpu_count()
+@cli_sensor(name="xrd.nfds")
+def xrd_numfds(interval: float) -> float:
+    """Number of file descriptors by all XRootD processes"""
+    tracker = cached_tracker(interval)
+    return tracker.num_fds()
 
 
-def prepare_threads(interval: float, max_core_threads: float):
-    tracker = XrootdTracker(rescan_interval=rescan(interval))
-    return lambda: 100.0 * tracker.num_threads() / max_core_threads / psutil.cpu_count()
+@cli_sensor(name="xrd.nthreads")
+def xrd_threads(interval: float) -> float:
+    """Number of threads by all XRootD processes"""
+    tracker = cached_tracker(interval)
+    return tracker.num_threads()
+
+
+def cached_tracker(interval: float):
+    try:
+        return TRACKER_CACHE[interval]
+    except KeyError:
+        tracker = XrootdTracker(rescan_interval=rescan(interval))
+        TRACKER_CACHE[interval] = tracker
+        return tracker
+
+
+TRACKER_CACHE = {}
 
 
 def is_alive(proc: psutil.Process) -> bool:

@@ -73,7 +73,7 @@ def test_run_sched(executable: List[str], sched_field: Tuple[int, str]):
         assert total == readings[index]
 
 
-PAG_PLUGINS = ["num_sockets", "xrootd.io_wait", "xrootd.num_fds", "xrootd.num_threads"]
+PAG_PLUGINS = ["xrd.piowait", "xrd.nfds", "xrd.nthreads"]
 
 
 @mimicry.skipif_unsuported
@@ -82,7 +82,7 @@ PAG_PLUGINS = ["num_sockets", "xrootd.io_wait", "xrootd.num_fds", "xrootd.num_th
 def test_run_pag_plugin(executable: List[str], pag_plugin):
     with mimicry.Process(name="xrootd", threads=20, files=20):
         output = capture(
-            [*executable, "--interval", "0.1", f"pag={pag_plugin}"], num_lines=5,
+            [*executable, "--interval", "0.1", f"--pag={pag_plugin}"], num_lines=5,
         )
         assert output
         for line in output:

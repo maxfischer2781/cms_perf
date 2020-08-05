@@ -69,18 +69,15 @@ similar to other tools such as XRootD's own ``XrdOlbMonPerf``:
    $pgio = 0;
 
 ``cms_perf`` allows to use the ``pag`` slot for one of several plugins.
-A plugin is selected by passing ``pag=<plugin name>`` to ``cms_perf``.
+A plugin is selected by passing ``--pag=<plugin formula>`` to ``cms_perf``.
 
 .. code:: bash
 
     $ # show help and plugins
     $ cms_perf --help
     ...
-    $ # show plugin specific help
-    $ python -m cms_perf pag=xrootd.num_fds -h
-    ...
     $ # use sensor with plugin
-    $ cms_perf --interval 10 pag=xrootd.num_fds --max-core-xfds 10
+    $ cms_perf --interval 10 --pag=xrd.nfds/10/ncores
     32 10 73 32 0
     33 4 72 34 0
     ...

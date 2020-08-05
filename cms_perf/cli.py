@@ -1,10 +1,12 @@
 import argparse
 
 from . import cli_parser
-from . import sensor  # noqa  # ensure sensors are loaded
-from . import xrd_load
-from . import net_load
 from . import __version__ as lib_version
+
+# ensure sensors are loaded
+from . import sensor  # noqa
+from . import xrd_load  # noqa
+from . import net_load  # noqa
 
 
 INTERVAL_UNITS = {"": 1, "s": 1, "m": 60, "h": 60 * 60}
@@ -64,73 +66,13 @@ CLI.add_argument(
     "--pmem", default="pmem", type=cli_parser.parse_sensor,
 )
 CLI.add_argument(
+    "--pag", default="0", type=cli_parser.parse_sensor,
+)
+CLI.add_argument(
     "--pio", default="pio", type=cli_parser.parse_sensor,
 )
 CLI.add_argument(
     "--sched",
     help="cms.sched directive to report total load and maxload on stderr",
     type=str,
-)
-CLI.set_defaults(__make_pag__=lambda args: lambda: 0)
-
-CLI_PAG = CLI.add_subparsers(
-    title="pag plugins", description="Sensor to use for the pag measurement",
-)
-
-# pag System Plugins
-CLI_PAG_NUMSOCK = CLI_PAG.add_parser(
-    "pag=num_sockets", help="Total sockets across all processes",
-)
-CLI_PAG_NUMSOCK.add_argument(
-    "--max-sockets",
-    default=1000,
-    help="Maximum total sockets considered 100%%",
-    type=int,
-)
-CLI_PAG_NUMSOCK.add_argument(
-    "--socket-kind",
-    help="Which sockets to count",
-    choices=list(net_load.ConnectionKind.__members__),
-    default="tcp",
-)
-CLI_PAG_NUMSOCK.set_defaults(
-    __make_pag__=lambda args: net_load.prepare_num_sockets(
-        net_load.ConnectionKind.__getitem__(args.socket_kind), args.max_sockets
-    )
-)
-
-# pag XRootD Plugins
-CLI_PAG_XIOWAIT = CLI_PAG.add_parser(
-    "pag=xrootd.io_wait", help="Relative time waiting for I/O by all xrootd processes",
-)
-CLI_PAG_XIOWAIT.set_defaults(
-    __make_pag__=lambda args: xrd_load.prepare_iowait(args.interval)
-)
-
-CLI_PAG_XNUMFDS = CLI_PAG.add_parser(
-    "pag=xrootd.num_fds", help="Open file handles of all xrootd processes",
-)
-CLI_PAG_XNUMFDS.add_argument(
-    "--max-core-xfds",
-    default=1,
-    help="Maximum open file handles per core considered 100%%",
-    type=float,
-)
-CLI_PAG_XNUMFDS.set_defaults(
-    __make_pag__=lambda args: xrd_load.prepare_numfds(args.interval, args.max_core_xfds)
-)
-
-CLI_PAG_XTHREADS = CLI_PAG.add_parser(
-    "pag=xrootd.num_threads", help="Threads of all xrootd processes",
-)
-CLI_PAG_XTHREADS.add_argument(
-    "--max-core-xthreads",
-    default=1,
-    help="Maximum threads per core considered 100%%",
-    type=float,
-)
-CLI_PAG_XTHREADS.set_defaults(
-    __make_pag__=lambda args: xrd_load.prepare_threads(
-        args.interval, args.max_core_xthreads
-    )
 )

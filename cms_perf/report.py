@@ -68,10 +68,10 @@ def clamp_percentages(value: float) -> int:
 
 def run_forever(
     interval: float,
-    pag_sensor,
     runq: Callable[[], float],
     pmem: Callable[[], float],
     pcpu: Callable[[], float],
+    pag: Callable[[], float],
     pio: Callable[[], float],
     sched: PseudoSched = None,
 ):
@@ -80,7 +80,7 @@ def run_forever(
         runq,
         pcpu,
         pmem,
-        pag_sensor,
+        pag,
         pio,
     )
     try:
@@ -103,17 +103,21 @@ def run_forever(
 def main():
     """Run the sensor based on CLI arguments"""
     options = CLI.parse_args()
-    runq, pcpu, pmem, pio = cli_parser.compile_sensors(
-        options.interval, options.runq, options.pcpu, options.pmem, options.pio
+    runq, pcpu, pmem, pag, pio = cli_parser.compile_sensors(
+        options.interval,
+        options.runq,
+        options.pcpu,
+        options.pmem,
+        options.pag,
+        options.pio,
     )
     sched = PseudoSched.from_directive(options.sched) if options.sched else None
-    pag_sensor = options.__make_pag__(options)
     run_forever(
         interval=options.interval,
         runq=runq,
         pcpu=pcpu,
         pmem=pmem,
+        pag=pag,
         pio=pio,
-        pag_sensor=pag_sensor,
         sched=sched,
     )
