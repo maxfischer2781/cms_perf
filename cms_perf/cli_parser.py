@@ -45,6 +45,16 @@ EXPRESSION = pp.infixNotation(
 )
 
 
+def parse(code: str) -> str:
+    """Parse a CLI code string to Python source code"""
+    try:
+        return EXPRESSION.parseString(code, parseAll=True)[0]
+    except pp.ParseException as pe:
+        raise SyntaxError(
+            str(pe), ("<cms_perf.cli_parser code>", pe.col, pe.loc, code)
+        ) from None
+
+
 # Sensor Plugins
 class Sensor(Protocol):
     """A sensor that can be registered for the CLI to provide values"""
@@ -169,7 +179,7 @@ def parse_sensor(
 ) -> Callable[..., Callable[[], float]]:
     name = name if name is not None else f"<cms_perf.cli_parser code {source!r}>"
     free_variables = ", ".join(SENSORS.keys() | TRANSFORMS.keys())
-    (py_source,) = EXPRESSION.parseString(source, parseAll=True)
+    py_source = parse(source)
     code = compile(
         f"lambda interval, {free_variables}: lambda: {py_source}",
         filename=name,
