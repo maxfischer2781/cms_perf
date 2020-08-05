@@ -175,7 +175,6 @@ def prepare_sensor(
         filename=name,
         mode="eval",
     )
-    print(source, f"lambda {free_variables}: {py_source}")
     return eval(code, {}, {})
 
 
