@@ -1,5 +1,6 @@
 import argparse
 
+from . import cli_parser
 from . import xrd_load
 from . import net_load
 from . import __version__ as lib_version
@@ -47,16 +48,22 @@ CLI.add_argument(
     "--version", action="version", version=lib_version,
 )
 CLI.add_argument(
-    "--max-core-runq",
-    default=1,
-    help="Maximum runq/loadavg per core considered 100%%",
-    type=float,
-)
-CLI.add_argument(
     "--interval",
     default=60,
     help="Interval between output; suffixed by s (default), m, or h",
     type=duration,
+)
+CLI.add_argument(
+    "--runq", default="100.0*loadq/ncores", type=cli_parser.parse_sensor,
+)
+CLI.add_argument(
+    "--pcpu", default="pcpu", type=cli_parser.parse_sensor,
+)
+CLI.add_argument(
+    "--pmem", default="pmem", type=cli_parser.parse_sensor,
+)
+CLI.add_argument(
+    "--pio", default="pio", type=cli_parser.parse_sensor,
 )
 CLI.add_argument(
     "--sched",

@@ -21,6 +21,37 @@ def test_run_normal(executable: List[str]):
             assert 0 <= int(reading) <= 100
 
 
+@pytest.mark.parametrize("executable", EXECUTABLES)
+def test_run_replaced(executable: List[str]):
+    output = capture(
+        [
+            *executable,
+            "--interval",
+            "0.02",
+            "--runq",
+            "0",
+            "--pcpu",
+            "1",
+            "--pmem",
+            "2",
+            "--pio",
+            "4",
+        ],
+        num_lines=5,
+    )
+    assert output
+    for line in output:
+        readings = line.split()
+        assert len(readings) == 5
+        for reading in readings:
+            assert 0 <= int(reading) <= 100
+        assert int(readings[0]) == 0
+        assert int(readings[1]) == 1
+        assert int(readings[2]) == 2
+        assert int(readings[3]) == 0  # pag
+        assert int(readings[4]) == 4
+
+
 SCHED_FIELD = tuple(enumerate(("runq", "cpu", "mem", "pag", "io")))
 
 

@@ -164,7 +164,7 @@ def _register_cli_callable(
 
 
 # digesting of CLI information
-def prepare_sensor(
+def parse_sensor(
     source: str, name: Optional[str] = None
 ) -> Callable[..., Callable[[], float]]:
     name = name if name is not None else f"<cms_perf.cli_parser code {source!r}>"

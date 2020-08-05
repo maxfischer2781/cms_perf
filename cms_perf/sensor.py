@@ -15,7 +15,7 @@ from .cli_parser import cli_sensor
 
 # individual sensors for system state
 @cli_sensor(name="runq")
-def system_load(interval: float) -> float:
+def system_runq(interval: float) -> float:
     """Get the current system load sample most closely matching ``interval``"""
     loadavg_index = 0 if interval <= 60 else 1 if interval <= 300 else 2
     return 100.0 * psutil.getloadavg()[loadavg_index] / psutil.cpu_count()
@@ -59,3 +59,17 @@ def network_utilization(interval: float) -> float:
         for nic in interface_speed.keys() & sent_old.keys() & sent_new.keys()
     }
     return 100.0 * max(interface_utilization.values())
+
+
+# Individual sensor components
+@cli_sensor(name="loadq")
+def system_loadq(interval: float) -> float:
+    """Get the current system load sample most closely matching ``interval``"""
+    loadavg_index = 0 if interval <= 60 else 1 if interval <= 300 else 2
+    return psutil.getloadavg()[loadavg_index]
+
+
+@cli_sensor(name="ncores")
+def system_ncpu(logical=True) -> float:
+    """Get the number of CPU cores, by default including logical cores as well"""
+    return float(psutil.cpu_count(logical=logical))

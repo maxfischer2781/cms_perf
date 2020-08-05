@@ -1,13 +1,15 @@
 """
 The main loop collecting and reporting values
 """
+from typing import Callable
 import sys
 import time
 from functools import partial
 
 from .cli import CLI
+from . import cli_parser
 from .sensor import (
-    system_load,
+    system_runq,
     cpu_utilization,
     memory_utilization,
     network_utilization,
@@ -72,20 +74,21 @@ def clamp_percentages(value: float) -> int:
 
 
 def run_forever(
-    max_core_runq: float, interval: float, pag_sensor, sched: PseudoSched = None
+    interval: float,
+    pag_sensor,
+    runq: Callable[[], float],
+    pmem: Callable[[], float],
+    pcpu: Callable[[], float],
+    pio: Callable[[], float],
+    sched: PseudoSched = None,
 ):
     """Write sensor information to stdout every ``interval`` seconds"""
-    base_sensors = (
-        partial(system_load, interval),
-        partial(cpu_utilization, interval),
-        partial(memory_utilization, interval),
-        partial(network_utilization, interval),
-    )
     sensors = (
-        lambda: base_sensors[0]() / max_core_runq,
-        *base_sensors[1:3],
+        runq,
+        pcpu,
+        pmem,
         pag_sensor,
-        base_sensors[3],
+        pio,
     )
     try:
         for _ in every(interval):
@@ -107,11 +110,17 @@ def run_forever(
 def main():
     """Run the sensor based on CLI arguments"""
     options = CLI.parse_args()
+    runq, pcpu, pmem, pio = cli_parser.compile_sensors(
+        options.interval, options.runq, options.pcpu, options.pmem, options.pio
+    )
     sched = PseudoSched.from_directive(options.sched) if options.sched else None
     pag_sensor = options.__make_pag__(options)
     run_forever(
-        max_core_runq=options.max_core_runq,
         interval=options.interval,
+        runq=runq,
+        pcpu=pcpu,
+        pmem=pmem,
+        pio=pio,
         pag_sensor=pag_sensor,
         sched=sched,
     )
