@@ -6,28 +6,28 @@ import time
 
 import psutil
 
-from .cli_parser import cli_sensor
+from .cli_parser import cli_call
 
 
 def rescan(interval):
     return min(interval * 10, 3600)
 
 
-@cli_sensor(name="xrd.piowait")
+@cli_call(name="xrd.piowait")
 def xrd_piowait(interval: float) -> float:
     """Percentage of time waiting for IO by all XRootD processes"""
     tracker = cached_tracker(interval)
     return 100.0 * tracker.io_wait()
 
 
-@cli_sensor(name="xrd.nfds")
+@cli_call(name="xrd.nfds")
 def xrd_numfds(interval: float) -> float:
     """Number of file descriptors by all XRootD processes"""
     tracker = cached_tracker(interval)
     return tracker.num_fds()
 
 
-@cli_sensor(name="xrd.nthreads")
+@cli_call(name="xrd.nthreads")
 def xrd_threads(interval: float) -> float:
     """Number of threads by all XRootD processes"""
     tracker = cached_tracker(interval)

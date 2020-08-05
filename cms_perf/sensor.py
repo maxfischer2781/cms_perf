@@ -10,25 +10,25 @@ import time
 
 import psutil
 
-from .cli_parser import cli_sensor
+from .cli_parser import cli_call
 
 
 # individual sensors for system state
-@cli_sensor(name="runq")
+@cli_call(name="runq")
 def system_runq(interval: float) -> float:
     """Get the current system load sample most closely matching ``interval``"""
     loadavg_index = 0 if interval <= 60 else 1 if interval <= 300 else 2
     return 100.0 * psutil.getloadavg()[loadavg_index] / psutil.cpu_count()
 
 
-@cli_sensor(name="pcpu")
+@cli_call(name="pcpu")
 def cpu_utilization(interval: float) -> float:
     """Get the current cpu utilisation relative to ``interval``"""
     sample_interval = min(interval / 4, 1)
     return psutil.cpu_percent(interval=sample_interval)
 
 
-@cli_sensor(name="pmem")
+@cli_call(name="pmem")
 def memory_utilization(interval: float) -> float:
     """Get the current memory utilisation"""
     return psutil.virtual_memory().percent
@@ -41,7 +41,7 @@ def _get_sent_bytes():
     }
 
 
-@cli_sensor(name="pio")
+@cli_call(name="pio")
 def network_utilization(interval: float) -> float:
     """Get the current network utilisation relative to ``interval``"""
     sample_interval = min(interval / 4, 1)
@@ -62,14 +62,14 @@ def network_utilization(interval: float) -> float:
 
 
 # Individual sensor components
-@cli_sensor(name="loadq")
+@cli_call(name="loadq")
 def system_loadq(interval: float) -> float:
     """Get the current system load sample most closely matching ``interval``"""
     loadavg_index = 0 if interval <= 60 else 1 if interval <= 300 else 2
     return psutil.getloadavg()[loadavg_index]
 
 
-@cli_sensor(name="ncores")
+@cli_call(name="ncores")
 def system_ncpu(logical=True) -> float:
     """Get the number of CPU cores, by default including logical cores as well"""
     return float(psutil.cpu_count(logical=logical))

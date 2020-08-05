@@ -58,8 +58,8 @@ def parse(code: str) -> str:
 
 
 # Sensor Plugins
-class Sensor(Protocol):
-    """A sensor that can be registered for the CLI to provide values"""
+class CLICall(Protocol):
+    """A callable that can be registered for the CLI to provide values"""
 
     def __call__(self, *args, **kwargs) -> float:
         ...
@@ -72,8 +72,7 @@ class Transform(Protocol):
         ...
 
 
-S = TypeVar("S", bound=Sensor)
-CT = TypeVar("CT", bound=Transform)
+S = TypeVar("S", bound=CLICall)
 
 
 class CallInfo(NamedTuple):
@@ -82,8 +81,7 @@ class CallInfo(NamedTuple):
 
 
 # transpiled_name => CallInfo
-TRANSFORMS: Dict[str, CallInfo] = {}
-SENSORS: Dict[str, CallInfo] = {}
+KNOWN_CALLABLES: Dict[str, CallInfo] = {}
 
 
 # automatic parser generation
@@ -138,41 +136,26 @@ def _compile_cli_call(call_name: str, transpiled_name: str, call: Callable):
 
 
 # registration decorators
-# These are practically the same, but types differ and we may need to do
-# additional pre-processing for each in the future.
-def cli_transform(name: Optional[str] = None):
+def cli_call(name: Optional[str] = None):
     """
-    Register a transformation for the CLI with its own name or ``name``
+    Register a sensor or transformation for the CLI with its own name or ``name``
     """
-    assert not callable(name), "cli_transform must be called before decorating"
-
-    def register(call: CT) -> CT:
-        _register_cli_callable(call, name, TRANSFORMS)
-        return call
-
-    return register
-
-
-def cli_sensor(name: Optional[str] = None):
-    """
-    Register a sensor for the CLI with its own name or ``name``
-    """
-    assert not callable(name), "cli_sensor must be called before decorating"
+    assert not callable(name), "cli_call must be called before decorating"
 
     def register(call: S) -> S:
-        _register_cli_callable(call, name, SENSORS)
+        _register_cli_callable(call, name)
         return call
 
     return register
 
 
-def _register_cli_callable(
-    call: S, cli_name: Optional[str], target: Dict[str, CallInfo]
-) -> S:
+def _register_cli_callable(call: S, cli_name: Optional[str]) -> S:
     cli_name = cli_name if cli_name is not None else call.__name__
     source_name = cli_name.replace(".", "_")
-    assert source_name not in target, f"cannot re-register CLI callable {source_name}"
-    target[source_name] = CallInfo(call, cli_name)
+    assert (
+        source_name not in KNOWN_CALLABLES
+    ), f"cannot re-register CLI callable {source_name}"
+    KNOWN_CALLABLES[source_name] = CallInfo(call, cli_name)
     GENERATED << pp.MatchFirst(
         (
             *(GENERATED.expr.exprs if GENERATED.expr else ()),
@@ -189,7 +172,7 @@ def parse_sensor(
     name = name if name is not None else f"<cms_perf.cli_parser code {source!r}>"
     py_source = parse(source)
     pp.ParserElement.resetCache()  # free parser cache
-    free_variables = ", ".join(SENSORS.keys() | TRANSFORMS.keys())
+    free_variables = ", ".join(KNOWN_CALLABLES)
     code = compile(
         f"lambda interval, {free_variables}: lambda: {py_source}",
         filename=name,
@@ -201,18 +184,16 @@ def parse_sensor(
 def compile_sensors(
     interval: float, *sensors: Callable[..., Callable[[], float]]
 ) -> List[Callable[[], float]]:
-    raw_sensors = {
-        name: sf_info.call for name, sf_info in (*SENSORS.items(), *TRANSFORMS.items())
-    }
+    raw_sensors = {name: sf_info.call for name, sf_info in KNOWN_CALLABLES.items()}
     return [sensor(interval=interval, **raw_sensors) for sensor in sensors]
 
 
 # CLI transformations
-@cli_transform(name="max")
+@cli_call(name="max")
 def maximum(*operands):
     return max(operands)
 
 
-@cli_transform(name="min")
+@cli_call(name="min")
 def minimum(*operands):
     return min(operands)

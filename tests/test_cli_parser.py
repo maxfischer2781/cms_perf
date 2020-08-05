@@ -4,23 +4,26 @@ from cms_perf import cli_parser
 from cms_perf import sensor as _mounted_sensors  # noqa
 
 
-@cli_parser.cli_sensor()
+@cli_parser.cli_call()
 def fake_sensor_factory(interval: int, value=1):
     return value
 
 
-@cli_parser.cli_sensor(name="fake.sensor")
+@cli_parser.cli_call(name="fake.sensor")
 def fake_aliased_sensor_factory(interval: int, value=1):
     return value
+
+
+SENSORS = ["runq", "loadq", "pcpu", "pmem", "pio"]
 
 
 SOURCES = [
     "1.0",
     "1337",
-    *(sensor.cli_name for sensor in cli_parser.SENSORS.values()),
+    *SENSORS,
     "1.0 / 1337",
     "100.0*loadq/ncores",
-    *(f"{sensor.cli_name} / 20" for sensor in cli_parser.SENSORS.values()),
+    *(f"{sensor} / 20" for sensor in SENSORS),
 ]
 
 
