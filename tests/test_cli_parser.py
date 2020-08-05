@@ -64,6 +64,7 @@ def test_known_sensor_calls(expected: float, source: str):
 KNOWN_TRANSFORMS = [
     (12.3, "max(1, 12.3)"),
     (2, "max(min(2, 4), 1)"),
+    (2, "max(min(2, 4, 3), 1, 1.5)"),
 ]
 
 

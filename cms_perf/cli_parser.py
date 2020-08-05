@@ -10,7 +10,7 @@ and everything compiles down to Python source code.
 The math part is an explicitly defined.
 Both calls and constants are automatically generated from Python objects.
 """
-from typing import TypeVar, Optional, Dict, NamedTuple, List, Callable, Tuple
+from typing import TypeVar, Optional, Dict, NamedTuple, List, Callable
 from typing_extensions import Protocol
 import inspect
 
@@ -77,7 +77,6 @@ CT = TypeVar("CT", bound=Transform)
 class CallInfo(NamedTuple):
     call: Callable[..., float]
     cli_name: str
-    cli_signature: List[str]
 
 
 # transpiled_name => CallInfo
@@ -85,36 +84,55 @@ TRANSFORMS: Dict[str, CallInfo] = {}
 SENSORS: Dict[str, CallInfo] = {}
 
 
-def compile_call(
-    call_name: str,
-    arity: int,
-    transpiled_name: Optional[str] = None,
-    extra_args: Tuple[str, ...] = (),
-):
+# automatic parser generation
+_COMPILEABLE_PARAMETERS = (
+    inspect.Parameter.POSITIONAL_OR_KEYWORD,
+    inspect.Parameter.VAR_POSITIONAL,
+)
+
+
+def _compile_cli_call(call_name: str, transpiled_name: str, call: Callable):
     """Compile a call with a given argument arity to a transpile expression"""
-    transpiled_name = transpiled_name if transpiled_name is not None else call_name
-    call_defaults = pp.Suppress(call_name)
+    transpilers = []
+    parameters = inspect.signature(call).parameters
+    implicit_interval = "interval" in parameters
+    if implicit_interval:
+        assert next(iter(parameters)) == "interval", "interval must be first"
+        parameters = {k: v for k, v in parameters.items() if k != "interval"}
+    for parameter in parameters.values():
+        assert parameter.kind in _COMPILEABLE_PARAMETERS, f"Cannot compile {parameter}"
+    if all(
+        param.default is not inspect.Parameter.empty
+        or param.kind == inspect.Parameter.VAR_POSITIONAL
+        for param in parameters.values()
+    ):
+        default_call = pp.Suppress(call_name)
 
-    @call_defaults.setParseAction
-    def transpile_no_args(result: pp.ParseResults) -> str:
-        parameters = ", ".join(extra_args)
-        return f"{transpiled_name}({parameters})"
+        @default_call.setParseAction
+        def transpile_default(result: pp.ParseResults) -> str:
+            arguments = "interval" if implicit_interval else ""
+            return f"{transpiled_name}({arguments})"
 
-    if arity > 0:
-        signature = EXPRESSION
-        for _ in range(arity - 1):
-            signature = signature - pp.Suppress(",") - EXPRESSION
-        call_params = (
-            pp.Suppress(call_name) + pp.Suppress("(") - signature - pp.Suppress(")")
-        )
+        transpilers.append(default_call)
+    if len(parameters):
+        argument_parsers = []
+        for parameter in parameters.values():
+            if argument_parsers:
+                argument_parsers.append(pp.Suppress(","))
+            if parameter.kind != inspect.Parameter.VAR_POSITIONAL:
+                argument_parsers.append(EXPRESSION)
+            else:
+                argument_parsers.append(pp.Optional(pp.delimitedList(EXPRESSION)))
+        signature = pp.And((pp.Suppress("("), *argument_parsers, pp.Suppress(")")))
+        parameter_call = pp.Suppress(call_name) + signature
 
-        @call_params.setParseAction
+        @parameter_call.setParseAction
         def transpile_with_args(result: pp.ParseResults) -> str:
-            parameters = ", ".join(extra_args + tuple(result))
-            return f"{transpiled_name}({parameters})"
+            arguments = ("interval, " if implicit_interval else "") + ", ".join(result)
+            return f"{transpiled_name}({arguments})"
 
-        return call_params, call_defaults
-    return (call_defaults,)
+        transpilers.append(parameter_call)
+    return transpilers[::-1]
 
 
 # registration decorators
@@ -152,22 +170,11 @@ def _register_cli_callable(
     cli_name = cli_name if cli_name is not None else call.__name__
     source_name = cli_name.replace(".", "_")
     assert source_name not in target, f"cannot re-register CLI callable {source_name}"
-    raw_parameters = inspect.signature(call).parameters
-    assert all(
-        param.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-        for param in raw_parameters.values()
-    ), "CLI callable may only take regular parameters"
-    cli_parameters = [param for param in raw_parameters if param != "interval"]
-    target[source_name] = CallInfo(call, cli_name, cli_parameters)
+    target[source_name] = CallInfo(call, cli_name)
     GENERATED << pp.MatchFirst(
         (
             *(GENERATED.expr.exprs if GENERATED.expr else ()),
-            *compile_call(
-                cli_name,
-                len(cli_parameters),
-                source_name,
-                ("interval",) if "interval" in raw_parameters else (),
-            ),
+            *_compile_cli_call(cli_name, source_name, call,),
         )
     )
     return call
@@ -199,10 +206,10 @@ def compile_sensors(
 
 # CLI transformations
 @cli_transform(name="max")
-def maximum(a, b):
-    return a if a >= b else b
+def maximum(*operands):
+    return max(operands)
 
 
 @cli_transform(name="min")
-def minimum(a, b):
-    return a if a <= b else b
+def minimum(*operands):
+    return min(operands)
