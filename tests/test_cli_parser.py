@@ -90,6 +90,9 @@ PRIVILEGED_SENSORS = [
     "nsockets",
     "nsockets(inet6)",
     "nsockets(tcp4)",
+    "xrd.piowait",
+    "xrd.nfds",
+    "xrd.nthreads",
 ]
 
 
@@ -104,4 +107,5 @@ def test_privileged_unprivileged(source: str):
 @pytest.mark.parametrize("source", PRIVILEGED_SENSORS)
 @pytest.mark.skipif(platform.system() != "Linux", reason="Require privilege on this OS")
 def test_privileged_privileged(source: str):
-    pass
+    (sensor,) = cli_parser.compile_sensors(0.01, cli_parser.parse_sensor(source))
+    assert 0 <= sensor()
