@@ -1,7 +1,15 @@
 import pytest
 
+import platform
+
+import psutil
+
 from cms_perf import cli_parser
-from cms_perf import sensor as _mounted_sensors  # noqa
+from cms_perf import (
+    sensor as _mount_sensors,
+    net_load as _mount_net_load,
+    xrd_load as _mount_xrd_load,
+)  # noqa
 
 
 @cli_parser.cli_call()
@@ -76,3 +84,24 @@ def test_known_transforms(expected: float, source: str):
     factory = cli_parser.parse_sensor(source)
     (sensor,) = cli_parser.compile_sensors(0.01, factory)
     assert expected == sensor()
+
+
+PRIVILEGED_SENSORS = [
+    "nsockets",
+    "nsockets(inet6)",
+    "nsockets(tcp4)",
+]
+
+
+@pytest.mark.parametrize("source", PRIVILEGED_SENSORS)
+@pytest.mark.skipif(platform.system() == "Linux", reason="Having privilege on this OS")
+def test_privileged_unprivileged(source: str):
+    (sensor,) = cli_parser.compile_sensors(0.01, cli_parser.parse_sensor(source))
+    with pytest.raises(psutil.AccessDenied):
+        sensor()
+
+
+@pytest.mark.parametrize("source", PRIVILEGED_SENSORS)
+@pytest.mark.skipif(platform.system() != "Linux", reason="Require privilege on this OS")
+def test_privileged_privileged(source: str):
+    pass

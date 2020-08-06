@@ -95,6 +95,8 @@ class DomainInfo(NamedTuple):
 KNOWN_CALLABLES: Dict[str, CallInfo] = {}
 KNOWN_DOMAINS: Dict[str, DomainInfo] = {}
 
+KNOWN_DOMAINS_MAP: Dict[type, DomainInfo] = {}
+
 
 # automatic parser generation
 def _extend_generated(*rules, base=GENERATED):
@@ -108,6 +110,17 @@ _COMPILEABLE_PARAMETERS = (
 
 LEFT_PAR = pp.Suppress("(").setName('"("')
 RIGHT_PAR = pp.Suppress(")").setName('")"')
+
+
+def _compile_parameter(parameter: inspect.Parameter):
+    annotation = parameter.annotation
+    if annotation not in (float, inspect.Parameter.empty):
+        assert annotation in KNOWN_DOMAINS_MAP, f"unknown CLI domain {annotation}"
+        domain_info = KNOWN_DOMAINS_MAP[annotation]
+        return domain_info.parser.copy().setName(
+            f".{parameter.name} <: {domain_info.cli_name}"
+        )
+    return EXPRESSION.copy().setName(f".{parameter.name} <: TERM")
 
 
 def _compile_cli_call(call_name: str, transpiled_name: str, call: Callable):
@@ -125,7 +138,7 @@ def _compile_cli_call(call_name: str, transpiled_name: str, call: Callable):
         or param.kind == inspect.Parameter.VAR_POSITIONAL
         for param in parameters.values()
     ):
-        default_call = pp.Suppress(call_name)
+        default_call = pp.Suppress(call_name).setName(f'"{call_name}"')
 
         @default_call.setParseAction
         def transpile_default(result: pp.ParseResults) -> str:
@@ -139,11 +152,12 @@ def _compile_cli_call(call_name: str, transpiled_name: str, call: Callable):
             if argument_parsers:
                 argument_parsers.append(pp.Suppress(","))
             if parameter.kind != inspect.Parameter.VAR_POSITIONAL:
-                argument_parsers.append(EXPRESSION)
+                argument_parsers.append(_compile_parameter(parameter))
             else:
-                argument_parsers.append(pp.Optional(pp.delimitedList(EXPRESSION)))
+                param_parser = _compile_parameter(parameter)
+                argument_parsers.append(pp.Optional(pp.delimitedList(param_parser)))
         signature = pp.And((LEFT_PAR, *argument_parsers, RIGHT_PAR))
-        parameter_call = pp.Suppress(call_name) + signature
+        parameter_call = pp.Suppress(call_name).setName(f'"{call_name}"') + signature
 
         @parameter_call.setParseAction
         def transpile_with_args(result: pp.ParseResults) -> str:
@@ -197,7 +211,7 @@ def cli_domain(name: Optional[str] = None):
     return register
 
 
-def _register_enum(domain: enum.Enum, cli_name: Optional[str]):
+def _register_enum(domain: Type[enum.Enum], cli_name: Optional[str]):
     cli_name = cli_name if cli_name is not None else domain.__name__
     source_name = cli_name.replace(".", "_")
     assert (
@@ -213,17 +227,23 @@ def _register_enum(domain: enum.Enum, cli_name: Optional[str]):
         (case,) = result
         return f"{source_name}['{case}']"
 
-    KNOWN_DOMAINS[source_name] = DomainInfo(Type[domain], cli_name, match_case)
+    KNOWN_DOMAINS_MAP[domain] = KNOWN_DOMAINS[source_name] = DomainInfo(
+        domain, cli_name, match_case
+    )
 
 
 # digesting of CLI information
 def parse_sensor(
     source: str, name: Optional[str] = None
 ) -> Callable[..., Callable[[], float]]:
-    name = name if name is not None else f"<cms_perf.cli_parser code {source!r}>"
     py_source = parse(source)
+    name = (
+        name
+        if name is not None
+        else f"<cms_perf.cli_parser code {source!r} => {py_source!r}>"
+    )
     pp.ParserElement.resetCache()  # free parser cache
-    free_variables = ", ".join(KNOWN_CALLABLES)
+    free_variables = ", ".join(KNOWN_CALLABLES.keys() | KNOWN_DOMAINS.keys())
     code = compile(
         f"lambda interval, {free_variables}: lambda: {py_source}",
         filename=name,
@@ -236,18 +256,21 @@ def compile_sensors(
     interval: float, *sensors: Callable[..., Callable[[], float]]
 ) -> List[Callable[[], float]]:
     raw_sensors = {name: sf_info.call for name, sf_info in KNOWN_CALLABLES.items()}
-    return [sensor(interval=interval, **raw_sensors) for sensor in sensors]
+    raw_domains = {name: dm_info.domain for name, dm_info in KNOWN_DOMAINS.items()}
+    return [
+        sensor(interval=interval, **raw_sensors, **raw_domains) for sensor in sensors
+    ]
 
 
 # CLI transformations
 @cli_call(name="max")
-def maximum(*operands):
-    return max(operands)
+def maximum(*arg):
+    return max(arg)
 
 
 @cli_call(name="min")
-def minimum(*operands):
-    return min(operands)
+def minimum(*arg):
+    return min(arg)
 
 
 if __name__ == "__main__":
