@@ -76,7 +76,7 @@ class XrootdTracker:
         )
 
     def io_wait(self) -> float:
-        return max(xrd.cpu_times().iowait for xrd in self.xrootds)
+        return max((xrd.cpu_times().iowait for xrd in self.xrootds), default=0)
 
     def num_fds(self) -> int:
         return sum(xrd.num_fds() for xrd in self.xrootds)
