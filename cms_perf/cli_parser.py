@@ -258,7 +258,7 @@ def compile_sensors(
     raw_sensors = {name: sf_info.call for name, sf_info in KNOWN_CALLABLES.items()}
     raw_domains = {name: dm_info.domain for name, dm_info in KNOWN_DOMAINS.items()}
     return [
-        sensor(interval=interval, **raw_sensors, **raw_domains) for sensor in sensors
+        factory(interval=interval, **raw_sensors, **raw_domains) for factory in sensors
     ]
 
 

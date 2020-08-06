@@ -5,11 +5,11 @@ import platform
 import psutil
 
 from cms_perf import cli_parser
-from cms_perf import (
+from cms_perf import (  # noqa
     sensor as _mount_sensors,
     net_load as _mount_net_load,
     xrd_load as _mount_xrd_load,
-)  # noqa
+)
 
 
 @cli_parser.cli_call()
