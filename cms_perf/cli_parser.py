@@ -46,9 +46,7 @@ EXPRESSION = pp.infixNotation(
         for operators in ("* /", "+ -")
     ],
 ).setName(
-    "(NUMBER | TERM | EXPRESSION), "
-    '[ ("*" | "/" | "+" | "-"), '
-    "(NUMBER | TERM | EXPRESSION)]"
+    '(NUMBER | TERM), [ ("*" | "/" | "+" | "-"), (NUMBER | TERM | EXPRESSION)]'
 )
 
 
@@ -118,9 +116,9 @@ def _compile_parameter(parameter: inspect.Parameter):
         assert annotation in KNOWN_DOMAINS_MAP, f"unknown CLI domain {annotation}"
         domain_info = KNOWN_DOMAINS_MAP[annotation]
         return domain_info.parser.copy().setName(
-            f".{parameter.name} <: {domain_info.cli_name}"
+            f"{parameter.name}={domain_info.cli_name}"
         )
-    return EXPRESSION.copy().setName(f".{parameter.name} <: TERM")
+    return EXPRESSION.copy().setName(f"{parameter.name}=TERM")
 
 
 def _compile_cli_call(call_name: str, transpiled_name: str, call: Callable):
