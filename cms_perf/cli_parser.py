@@ -45,9 +45,7 @@ EXPRESSION = pp.infixNotation(
         (pp.oneOf(operators), 2, pp.opAssoc.LEFT, transpile_binop)
         for operators in ("* /", "+ -")
     ],
-).setName(
-    '(NUMBER | TERM), [ ("*" | "/" | "+" | "-"), (NUMBER | TERM | EXPRESSION)]'
-)
+).setName('(NUMBER | TERM), [ ("*" | "/" | "+" | "-"), (NUMBER | TERM | EXPRESSION)]')
 
 
 def parse(code: str) -> str:
