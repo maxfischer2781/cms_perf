@@ -5,7 +5,10 @@ import enum
 
 import psutil
 
+from .cli_parser import cli_domain, cli_call
 
+
+@cli_domain(name="KIND")
 class ConnectionKind(enum.Enum):
     inet = enum.auto()
     inet4 = enum.auto()
@@ -20,9 +23,6 @@ class ConnectionKind(enum.Enum):
     all = enum.auto()
 
 
-def prepare_num_sockets(kind: ConnectionKind, max_sockets):
-    return lambda: 100.0 * num_sockets(kind) / max_sockets
-
-
-def num_sockets(kind: ConnectionKind) -> float:
+@cli_call(name="nsockets")
+def num_sockets(kind: ConnectionKind = ConnectionKind.tcp) -> float:
     return len(psutil.net_connections(kind=kind.name))

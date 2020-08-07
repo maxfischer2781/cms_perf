@@ -1,3 +1,3 @@
 """Sensor for the XRootD cms.perf directive"""
 
-__version__ = "0.3.0"
+__version__ = "0.4.0-alpha1"

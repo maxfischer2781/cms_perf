@@ -1,16 +1,12 @@
 """
 The main loop collecting and reporting values
 """
+from typing import Callable
 import sys
 import time
 
 from .cli import CLI
-from .sensor import (
-    system_load,
-    cpu_utilization,
-    memory_utilization,
-    network_utilization,
-)
+from . import cli_parser
 
 
 class PseudoSched:
@@ -71,21 +67,25 @@ def clamp_percentages(value: float) -> int:
 
 
 def run_forever(
-    max_core_runq: float, interval: float, pag_sensor, sched: PseudoSched = None
+    interval: float,
+    runq: Callable[[], float],
+    pmem: Callable[[], float],
+    pcpu: Callable[[], float],
+    pag: Callable[[], float],
+    pio: Callable[[], float],
+    sched: PseudoSched = None,
 ):
     """Write sensor information to stdout every ``interval`` seconds"""
+    sensors = (
+        runq,
+        pcpu,
+        pmem,
+        pag,
+        pio,
+    )
     try:
         for _ in every(interval):
-            (*values,) = map(
-                clamp_percentages,
-                (
-                    system_load(interval) / max_core_runq,
-                    cpu_utilization(interval),
-                    memory_utilization(),
-                    pag_sensor(),
-                    network_utilization(interval),
-                ),
-            )
+            (*values,) = map(clamp_percentages, map(lambda x: x(), sensors,),)
             print(*values, end="", flush=True)
             if sched is not None:
                 load, rejected = sched.weight(*values)
@@ -103,11 +103,21 @@ def run_forever(
 def main():
     """Run the sensor based on CLI arguments"""
     options = CLI.parse_args()
+    runq, pcpu, pmem, pag, pio = cli_parser.compile_sensors(
+        options.interval,
+        options.runq,
+        options.pcpu,
+        options.pmem,
+        options.pag,
+        options.pio,
+    )
     sched = PseudoSched.from_directive(options.sched) if options.sched else None
-    pag_sensor = options.__make_pag__(options)
     run_forever(
-        max_core_runq=options.max_core_runq,
         interval=options.interval,
-        pag_sensor=pag_sensor,
+        runq=runq,
+        pcpu=pcpu,
+        pmem=pmem,
+        pag=pag,
+        pio=pio,
         sched=sched,
     )
