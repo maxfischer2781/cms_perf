@@ -29,6 +29,7 @@ test = [
     "black",
     "setproctitle",
 ]
+doc = ["sphinx", "sphinxcontrib-contentui"]
 
 [tool.black]
 target-version = ['py36', 'py37', 'py38']
