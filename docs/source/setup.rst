@@ -12,7 +12,7 @@ Installing the Sensor
 
 The ``cms_perf`` library and executable are available via the ``pip`` package manager.
 
-.. content-tabs::
+.. content-tabs:: setup
 
     .. tab-container:: system
         :title: System Installation
@@ -40,7 +40,7 @@ Installing the sensor creates a ``cms_perf`` executable.
 The module can also be run directly by the respective python executable,
 e.g. ``python3 -m cms_perf``.
 
-.. content-tabs::
+.. content-tabs:: setup
 
     .. tab-container:: system
         :title: System Installation
