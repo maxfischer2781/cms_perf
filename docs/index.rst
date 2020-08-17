@@ -24,6 +24,7 @@
    :hidden:
 
    source/setup
+   source/cli_lang
 
 Sensor for use in the XRootD ``cms.perf`` directive.
 Measures system load, as well as cpu, memory, and network utilization,
