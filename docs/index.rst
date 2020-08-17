@@ -20,7 +20,7 @@
     :target: https://github.com/maxfischer2781/cms_perf/blob/master/LICENSE
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :hidden:
 
    source/setup
