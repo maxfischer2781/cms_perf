@@ -16,3 +16,5 @@ Load Sensors
 
 The ``cms_perf`` provides five sensor readings as percentages.
 By default, they express the canonical ``cms.perf`` readings:
+
+.. include:: ../generated/cli_sensors.rst
