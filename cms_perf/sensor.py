@@ -14,8 +14,8 @@ from .cli_parser import cli_call
 
 
 # individual sensors for system state
-@cli_call(name="runq")
-def system_runq(interval: float) -> float:
+@cli_call(name="prunq")
+def system_prunq(interval: float) -> float:
     """Get the current system load sample most closely matching ``interval``"""
     loadavg_index = 0 if interval <= 60 else 1 if interval <= 300 else 2
     return 100.0 * psutil.getloadavg()[loadavg_index] / psutil.cpu_count()
