@@ -23,7 +23,11 @@
    :maxdepth: 1
    :hidden:
 
+   source/setup
 
+Sensor for use in the XRootD ``cms.perf`` directive.
+Measures system load, as well as cpu, memory, and network utilization,
+to enable load-balancing in a cluster of multiple XRootD servers.
 
 Indices and tables
 ==================
