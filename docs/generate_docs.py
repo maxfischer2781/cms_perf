@@ -13,7 +13,7 @@ def document_cli_sensors():
         if action.type != cli.cli_parser.parse_sensor:
             continue
         cli_name = max(action.option_strings, key=len)
-        rst_lines.append(f"`{cli_name}={action.default}`\n   {action.help}\n")
+        rst_lines.append(f"``{cli_name}={action.default}``\n   {action.help}\n")
     return "\n".join(rst_lines)
 
 
