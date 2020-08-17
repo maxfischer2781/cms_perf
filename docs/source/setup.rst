@@ -12,18 +12,16 @@ Installing the Sensor
 
 The ``cms_perf`` library and executable are available via the ``pip`` package manager.
 
-.. content-tabs:: setup
+.. tabs::
 
-    .. tab-container:: system
-        :title: System Installation
+    .. group-tab:: System Installation
 
         .. code:: bash
 
             # install globally for the system Python3
             python3 -m pip install cms_perf
 
-    .. tab-container:: venv
-        :title: VEnv Installation
+    .. group-tab:: VEnv Installation
 
         .. code:: bash
 
@@ -41,17 +39,15 @@ Installing the sensor creates a ``cms_perf`` executable.
 The module can also be run directly by the respective python executable,
 e.g. ``python3 -m cms_perf``.
 
-.. content-tabs:: setup
+.. tabs::
 
-    .. tab-container:: system
-        :title: System Installation
+    .. group-tab:: System Installation
 
         .. code:: bash
 
             cms_perf --help
 
-    .. tab-container:: venv
-        :title: VEnv Installation
+    .. group-tab:: VEnv Installation
 
         .. code:: bash
 
@@ -63,18 +59,16 @@ Configuring XRootD
 Set ``cms_perf`` as the ``pgm`` of the ``cms.perf`` directive.
 Use the same interval for the directive's ``int`` and the sensor's ``--interval``.
 
-.. content-tabs:: setup
+.. tabs::
 
-    .. tab-container:: system
-        :title: System Installation
+    .. group-tab:: System Installation
 
         .. code::
 
             set SCRIPT_BIN = /usr/local/bin
             cms.perf int 2m pgm $(SCRIPT_BIN)/cms_perf --interval 2m
 
-    .. tab-container:: venv
-        :title: VEnv Installation
+    .. group-tab:: VEnv Installation
 
         .. code::
 

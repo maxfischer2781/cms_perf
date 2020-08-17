@@ -37,7 +37,7 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.imgmath',
     'sphinx.ext.viewcode',
-    'sphinxcontrib.contentui',
+    'sphinx_tabs.tabs',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
