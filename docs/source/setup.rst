@@ -76,7 +76,7 @@ Use the same interval for the directive's ``int`` and the sensor's ``--interval`
     .. tab-container:: venv
         :title: VEnv Installation
 
-        .. code:: bash
+        .. code::
 
             set SCRIPT_BIN = /opt/xrootd/py3venv/bin
             cms.perf int 2m pgm $(SCRIPT_BIN)/cms_perf --interval 2m
