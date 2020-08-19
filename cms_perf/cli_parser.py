@@ -260,13 +260,15 @@ def compile_sensors(
 
 # CLI transformations
 @cli_call(name="max")
-def maximum(*arg):
-    return max(arg)
+def maximum(a, b, *others):
+    """Compute the maximum value of all arguments"""
+    return max(a, b, *others)
 
 
 @cli_call(name="min")
-def minimum(*arg):
-    return min(arg)
+def minimum(a, b, *others):
+    """Compute the minimum value of all arguments"""
+    return min(a, b, *others)
 
 
 if __name__ == "__main__":

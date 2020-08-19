@@ -45,12 +45,17 @@ or using the name followed by parenthesised arguments.
 
         .. code:: bash
 
-            # allow 10x load per physical+logical core than usual
+            # allow 10x load per all cores than usual
             cms_perf --runq=100.0*loadq/10/ncores
 
     .. group-tab:: Custom Arguments
 
         .. code:: bash
 
-            # allow 10x load per physical core than usual
+            # allow 10x load per physical cores than usual
             cms_perf --runq=100.0*loadq/10/ncores(physical)
+
+Available Functions
+===================
+
+.. include:: ../generated/cli_callables.rst

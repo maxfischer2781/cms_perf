@@ -25,4 +25,5 @@ class ConnectionKind(enum.Enum):
 
 @cli_call(name="nsockets")
 def num_sockets(kind: ConnectionKind = ConnectionKind.tcp) -> float:
+    """Number of open sockets of a given kind"""
     return len(psutil.net_connections(kind=kind.name))
