@@ -34,6 +34,7 @@ def document_cli_call(call_info: cli_parser.CallInfo) -> str:
         signature = ', '.join(f"{arg_name}" for arg_name in parameters)
         rst_lines.append(f"``{call_info.cli_name}({signature})``")
     assert rst_lines, f"{call_info.cli_name} must support one of defaults or parameters"
+    assert getattr(call_info.call, '__doc__'), f"{call_info.cli_name} needs a __doc__"
     rst_lines.extend(
         f"\t{line}" for line in call_info.call.__doc__.splitlines()
     )
