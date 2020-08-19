@@ -14,10 +14,15 @@ to calculate the final reading.
 Load Sensors
 ============
 
-The ``cms_perf`` provides five sensor readings as percentages.
+The ``cms_perf`` provides five sensor readings as percentages,
+which can be customized individually.
 By default, they express the canonical ``cms.perf`` readings:
 
 .. include:: ../generated/cli_sensors.rst
+
+Each canonical sensor reading is available in sensor expressions
+with its canonical name.
+For example, ``prunq`` always refers to the default definition of ``--prunq``.
 
 Sensor Expressions
 ==================
