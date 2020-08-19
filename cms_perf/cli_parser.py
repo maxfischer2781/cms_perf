@@ -152,7 +152,9 @@ def _compile_cli_call(call_name: str, transpiled_name: str, call: Callable):
             else:
                 param_parser = pp.delimitedList(_compile_parameter(parameter))
                 if argument_parsers:
-                    argument_parsers.append(pp.Optional(pp.Suppress(",") - param_parser))
+                    argument_parsers.append(
+                        pp.Optional(pp.Suppress(",") - param_parser)
+                    )
                 else:
                     argument_parsers.append(pp.Optional(param_parser))
         signature = pp.And((LEFT_PAR, *argument_parsers, RIGHT_PAR))
