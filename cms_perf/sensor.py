@@ -7,10 +7,11 @@ Sensors for the canonical cms.perf measurements
     It exists for backwards compatibility but is assumed 0.
 """
 import time
+import enum
 
 import psutil
 
-from .cli_parser import cli_call
+from .cli_parser import cli_call, cli_domain
 
 
 # individual sensors for system state
@@ -69,7 +70,18 @@ def system_loadq(interval: float) -> float:
     return psutil.getloadavg()[loadavg_index]
 
 
+@cli_domain(name="CPU")
+class CpuKind(enum.Enum):
+    all = enum.auto()
+    physical = enum.auto()
+
+
 @cli_call(name="ncores")
-def system_ncpu(logical=True) -> float:
-    """Number of CPU cores, by default including logical cores as well"""
-    return float(psutil.cpu_count(logical=logical))
+def system_ncpu(kind: CpuKind = CpuKind.all) -> float:
+    """
+    Number of CPU cores, by default including logical cores as well
+
+    ``kind`` selects which cores to count, and my be either ``all`` or ``physical``.
+    It defaults to ``all``.
+    """
+    return float(psutil.cpu_count(logical=kind is CpuKind.all))

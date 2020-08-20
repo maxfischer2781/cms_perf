@@ -25,5 +25,14 @@ class ConnectionKind(enum.Enum):
 
 @cli_call(name="nsockets")
 def num_sockets(kind: ConnectionKind = ConnectionKind.tcp) -> float:
-    """Number of open sockets of a given kind"""
+    """
+    Number of open sockets across all processes
+
+    ``kind`` selects which sockets to count, and my be one of
+    ``inet``, ``inet4``, ``inet6``,
+    ``tcp``, ``tcp4``, ``tcp6``,
+    ``udp``, ``udp4``, ``udp6``,
+    ``unix`` or ``all``.
+    It defaults to ``tcp``.
+    """
     return len(psutil.net_connections(kind=kind.name))
