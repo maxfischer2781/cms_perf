@@ -145,13 +145,18 @@ def _compile_cli_call(call_name: str, transpiled_name: str, call: Callable):
     if len(parameters):
         argument_parsers = []
         for parameter in parameters.values():
-            if argument_parsers:
-                argument_parsers.append(pp.Suppress(","))
             if parameter.kind != inspect.Parameter.VAR_POSITIONAL:
+                if argument_parsers:
+                    argument_parsers.append(pp.Suppress(","))
                 argument_parsers.append(_compile_parameter(parameter))
             else:
-                param_parser = _compile_parameter(parameter)
-                argument_parsers.append(pp.Optional(pp.delimitedList(param_parser)))
+                param_parser = pp.delimitedList(_compile_parameter(parameter))
+                if argument_parsers:
+                    argument_parsers.append(
+                        pp.Optional(pp.Suppress(",") - param_parser)
+                    )
+                else:
+                    argument_parsers.append(pp.Optional(param_parser))
         signature = pp.And((LEFT_PAR, *argument_parsers, RIGHT_PAR))
         parameter_call = pp.Suppress(call_name).setName(f'"{call_name}"') + signature
 
@@ -260,13 +265,15 @@ def compile_sensors(
 
 # CLI transformations
 @cli_call(name="max")
-def maximum(*arg):
-    return max(arg)
+def maximum(a, b, *others):
+    """The maximum value of all arguments"""
+    return max(a, b, *others)
 
 
 @cli_call(name="min")
-def minimum(*arg):
-    return min(arg)
+def minimum(a, b, *others):
+    """The minimum value of all arguments"""
+    return min(a, b, *others)
 
 
 if __name__ == "__main__":

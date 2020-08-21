@@ -3,7 +3,7 @@ import pytest
 from cms_perf import sensor
 
 SENSORS = (
-    sensor.system_runq,
+    sensor.system_prunq,
     sensor.cpu_utilization,
     sensor.memory_utilization,
     sensor.network_utilization,

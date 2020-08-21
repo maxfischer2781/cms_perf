@@ -22,7 +22,7 @@ def fake_aliased_sensor_factory(interval: int, value=1):
     return value
 
 
-SENSORS = ["runq", "loadq", "pcpu", "pmem", "pio"]
+SENSORS = ["prunq", "loadq", "pcpu", "pmem", "pio"]
 
 
 SOURCES = [
@@ -96,7 +96,9 @@ PRIVILEGED_SENSORS = [
 ]
 
 
-@pytest.mark.parametrize("source", PRIVILEGED_SENSORS)
+@pytest.mark.parametrize(
+    "source", [sensor for sensor in PRIVILEGED_SENSORS if "xrd" not in sensor]
+)
 @pytest.mark.skipif(platform.system() == "Linux", reason="Having privilege on this OS")
 def test_privileged_unprivileged(source: str):
     (sensor,) = cli_parser.compile_sensors(0.01, cli_parser.parse_sensor(source))

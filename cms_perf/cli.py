@@ -57,19 +57,34 @@ CLI.add_argument(
     type=duration,
 )
 CLI.add_argument(
-    "--runq", default="100.0*loadq/ncores", type=cli_parser.parse_sensor,
+    "--prunq",
+    default="100.0*loadq/ncores",
+    type=cli_parser.parse_sensor,
+    help="Expression to compute system load percentage",
 )
 CLI.add_argument(
-    "--pcpu", default="pcpu", type=cli_parser.parse_sensor,
+    "--pcpu",
+    default="pcpu",
+    type=cli_parser.parse_sensor,
+    help="Expression to compute cpu utilization percentage",
 )
 CLI.add_argument(
-    "--pmem", default="pmem", type=cli_parser.parse_sensor,
+    "--pmem",
+    default="pmem",
+    type=cli_parser.parse_sensor,
+    help="Expression to compute memory utilization percentage",
 )
 CLI.add_argument(
-    "--pag", default="0", type=cli_parser.parse_sensor,
+    "--ppag",
+    default="0",
+    type=cli_parser.parse_sensor,
+    help="Expression to compute paging load percentage",
 )
 CLI.add_argument(
-    "--pio", default="pio", type=cli_parser.parse_sensor,
+    "--pio",
+    default="pio",
+    type=cli_parser.parse_sensor,
+    help="Expression to compute network utilization percentage",
 )
 CLI.add_argument(
     "--sched",

@@ -68,19 +68,19 @@ def clamp_percentages(value: float) -> int:
 
 def run_forever(
     interval: float,
-    runq: Callable[[], float],
+    prunq: Callable[[], float],
     pmem: Callable[[], float],
     pcpu: Callable[[], float],
-    pag: Callable[[], float],
+    ppag: Callable[[], float],
     pio: Callable[[], float],
     sched: PseudoSched = None,
 ):
     """Write sensor information to stdout every ``interval`` seconds"""
     sensors = (
-        runq,
+        prunq,
         pcpu,
         pmem,
-        pag,
+        ppag,
         pio,
     )
     try:
@@ -103,21 +103,21 @@ def run_forever(
 def main():
     """Run the sensor based on CLI arguments"""
     options = CLI.parse_args()
-    runq, pcpu, pmem, pag, pio = cli_parser.compile_sensors(
+    prunq, pcpu, pmem, ppag, pio = cli_parser.compile_sensors(
         options.interval,
-        options.runq,
+        options.prunq,
         options.pcpu,
         options.pmem,
-        options.pag,
+        options.ppag,
         options.pio,
     )
     sched = PseudoSched.from_directive(options.sched) if options.sched else None
     run_forever(
         interval=options.interval,
-        runq=runq,
+        prunq=prunq,
         pcpu=pcpu,
         pmem=pmem,
-        pag=pag,
+        ppag=ppag,
         pio=pio,
         sched=sched,
     )

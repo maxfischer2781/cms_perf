@@ -30,13 +30,13 @@ def test_run_replaced(executable: List[str]):
             *executable,
             "--interval",
             "0.02",
-            "--runq",
+            "--prunq",
             "0",
             "--pcpu",
             "1",
             "--pmem",
             "2",
-            "--pag",
+            "--ppag",
             "3",
             "--pio",
             "4",
@@ -81,7 +81,7 @@ PAG_PLUGINS = ["xrd.piowait", "xrd.nfds", "xrd.nthreads"]
 def test_run_pag_plugin(executable: List[str], pag_plugin):
     with mimicry.Process(name="xrootd", threads=20, files=20):
         output = capture(
-            [*executable, "--interval", "0.1", f"--pag={pag_plugin}"], num_lines=5,
+            [*executable, "--interval", "0.1", f"--ppag={pag_plugin}"], num_lines=5,
         )
         assert output
         for line in output:
