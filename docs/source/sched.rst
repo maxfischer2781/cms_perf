@@ -26,6 +26,9 @@ the total weight is written to *stderr* as a new row.
     13 1 70 0 0 44
     13 2 70 0 0 45
 
+The sched emulator only uses the load parameters it can process and
+ignores the rest, including for example a leading *cms.sched*.
+
 Testing Server Rejection
 ========================
 
@@ -46,3 +49,6 @@ exceeds the threshold.
     13 1 70 0 0 44
     13 1 70 0 0 44
     13 2 70 0 0 45!
+
+Since the sensor does not collect data for the *space* weight,
+the emulator ignores this as well.
