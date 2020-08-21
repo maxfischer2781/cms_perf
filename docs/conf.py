@@ -63,9 +63,9 @@ html_theme = "alabaster"
 html_static_path = ["_static"]
 
 html_theme_options = {
-    "description": "The missing async toolbox",
+    "description": "Sensor for the XRootD cms.perf directive",
     "github_user": "maxfischer2781",
-    "github_repo": "asyncstdlib",
+    "github_repo": "cms_perf",
     "fixed_sidebar": True,
 }
 
