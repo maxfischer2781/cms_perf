@@ -25,6 +25,7 @@
 
    source/setup
    source/cli_lang
+   source/sched
 
 Sensor for use in the XRootD ``cms.perf`` directive.
 Measures system load, as well as cpu, memory, and network utilization,
