@@ -1,5 +1,6 @@
 from pathlib import Path
 import inspect
+import textwrap
 
 from cms_perf import cli
 from cms_perf import cli_parser
@@ -7,6 +8,10 @@ from cms_perf import cli_parser
 
 TARGET_DIR = Path(__file__).parent / "generated"
 TARGET_DIR.mkdir(exist_ok=True)
+
+
+def normalized_doc(obj):
+    return textwrap.dedent(obj.__doc__).strip()
 
 
 def document_cli_sensors():
@@ -42,13 +47,17 @@ def document_cli_call(call_info: cli_parser.CallInfo) -> str:
     assert rst_lines, f"{call_info.cli_name} must support one of defaults or parameters"
     rst_lines = [" or ".join(rst_lines)]
     assert getattr(call_info.call, "__doc__"), f"{call_info.cli_name} needs a __doc__"
-    rst_lines.extend(f"\t{line}" for line in call_info.call.__doc__.splitlines())
+    rst_lines.extend(
+        f"   {line}" for line in normalized_doc(call_info.call).splitlines()
+    )
     return "\n".join(rst_lines)
 
 
 def document_cli_calls():
     rst_blocks = []
-    for call_info in cli_parser.KNOWN_CALLABLES.values():
+    for call_info in sorted(
+        cli_parser.KNOWN_CALLABLES.values(), key=lambda ci: ci.cli_name
+    ):
         rst_blocks.append(document_cli_call(call_info))
     return "\n\n".join(rst_blocks)
 
