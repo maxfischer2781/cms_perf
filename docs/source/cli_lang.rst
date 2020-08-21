@@ -34,6 +34,16 @@ Expressions use a simple language, which consists of
 * function calls with and without arguments, and
 * constants such as numbers and enums.
 
+Constant Literals
+-----------------
+
+Number literals are decimals, with optional sign and fractional part.
+For example, this includes ``12``, ``-1.2``, and ``12.``.
+
+Enum literals are plain names, and only allowed in functions that expect them.
+For example, ``ncores`` allows ``ncores(all)`` and ``ncores(physical)``,
+but not ``ncores(inet6)`` nor ``ncores("all")``.
+
 Functions Calls
 ---------------
 
