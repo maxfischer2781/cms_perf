@@ -28,7 +28,7 @@ def num_sockets(kind: ConnectionKind = ConnectionKind.tcp) -> float:
     """
     Number of open sockets across all processes
 
-    ``kind`` selects which sockets to count, and my be one of
+    ``kind`` selects which sockets to count, and may be one of
     ``inet``, ``inet4``, ``inet6``,
     ``tcp``, ``tcp4``, ``tcp6``,
     ``udp``, ``udp4``, ``udp6``,
