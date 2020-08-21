@@ -63,7 +63,7 @@ html_theme = "alabaster"
 html_static_path = ["_static"]
 
 html_theme_options = {
-    "description": "Load sensor for XRootD servers",
+    "description": "Load sensor for XRootD",
     "github_user": "maxfischer2781",
     "github_repo": "cms_perf",
     "fixed_sidebar": True,
