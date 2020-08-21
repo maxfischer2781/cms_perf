@@ -30,9 +30,34 @@ Sensor for use in the XRootD ``cms.perf`` directive.
 Measures system load, as well as cpu, memory, and network utilization,
 to enable load-balancing in a cluster of multiple XRootD servers.
 
+Quick Guide
+===========
+
+The library and executable can be installed using the ``pip`` package manager:
+
+.. code:: bash
+
+   python3 -m pip install cms_perf
+
+Afterwards, add the executable to the ``cms.perf`` directive in the XRootD config:
+
+.. code::
+
+   cms.perf int 2m pgm /usr/local/bin/cms_perf --interval 2m
+
+See the :doc:`source/setup` and :doc:`source/cli_lang` guides for details.
+
+Issues and Contributions
+========================
+
+Maintenance and development of ``cms.perf`` is centralised at its `GitHub Repository`_.
+Feel free to open a ticket or pull request.
+
 Indices and tables
 ==================
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+.. _GitHub Repository: https://github.com/maxfischer2781/cms_perf
