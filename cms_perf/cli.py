@@ -4,9 +4,7 @@ from . import cli_parser
 from . import __version__ as lib_version
 
 # ensure sensors are loaded
-from . import sensor  # noqa
-from . import xrd_load  # noqa
-from . import net_load  # noqa
+from .sensors import sensor, xrd_load, net_load  # noqa
 
 
 INTERVAL_UNITS = {"": 1, "s": 1, "m": 60, "h": 60 * 60}

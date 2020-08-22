@@ -6,7 +6,7 @@ import time
 
 import psutil
 
-from .cli_parser import cli_call
+from ..cli_parser import cli_call
 
 
 def rescan(interval):

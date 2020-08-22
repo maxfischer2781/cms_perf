@@ -1,6 +1,6 @@
 import pytest
 
-from cms_perf import sensor
+from cms_perf.sensors import sensor
 
 SENSORS = (
     sensor.system_prunq,
