@@ -5,8 +5,8 @@ from typing import Callable
 import sys
 import time
 
-from .cli import CLI
-from . import cli_parser
+from .setup.cli import CLI
+from .setup import cli_parser
 
 
 class PseudoSched:
