@@ -21,7 +21,7 @@ class PseudoSched:
         self.maxload = maxload
 
     @classmethod
-    def from_directive(cls, directive: str):
+    def from_directive(cls, directive: str) -> "PseudoSched":
         """Create an instance by parsing a ``cms.sched`` directive"""
         items = directive.split()
         policy = {
@@ -76,16 +76,10 @@ def run_forever(
     sched: PseudoSched = None,
 ):
     """Write sensor information to stdout every ``interval`` seconds"""
-    sensors = (
-        prunq,
-        pcpu,
-        pmem,
-        ppag,
-        pio,
-    )
+    sensors = (prunq, pcpu, pmem, ppag, pio)
     try:
         for _ in every(interval):
-            (*values,) = map(clamp_percentages, map(lambda x: x(), sensors,),)
+            values = [clamp_percentages(sensor()) for sensor in sensors]
             print(*values, end="", flush=True)
             if sched is not None:
                 load, rejected = sched.weight(*values)
