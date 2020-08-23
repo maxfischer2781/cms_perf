@@ -7,6 +7,24 @@ from .. import __version__ as lib_version
 from ..sensors import sensor, xrd_load, net_load  # noqa
 
 
+class ConfigArgumentParser(argparse.ArgumentParser):
+    """
+    Custom parser for ini-style config files, provided as ``@/path/to/config``
+
+    Allows comments and the use of key value notation, as in::
+
+        # Set the --prunq option
+        prunq = 100.0*loadq/40/ncores
+    """
+    def convert_arg_line_to_args(self, arg_line):
+        arg_line, *_ = arg_line.split('#', 1)
+        if not arg_line.strip():
+            return []
+        key, _, value = [elem.strip() for elem in arg_line.partition('=')]
+        key = key if key.startswith('--') else ('--' + key)
+        return [key, value] if value else [key]
+
+
 INTERVAL_UNITS = {"": 1, "s": 1, "m": 60, "h": 60 * 60}
 
 
@@ -32,7 +50,7 @@ def duration(literal: str) -> float:
     return float(value) * scale
 
 
-CLI = argparse.ArgumentParser(
+CLI = ConfigArgumentParser(
     description="Performance Sensor for XRootD cms.perf directive",
     epilog=(
         "In regular intervals, outputs a single line with percentages of: "
@@ -44,6 +62,7 @@ CLI = argparse.ArgumentParser(
         "The paging load exists for historical reasons; "
         "it cannot be reliably computed."
     ),
+    fromfile_prefix_chars='@',
 )
 CLI.add_argument(
     "--version", action="version", version=lib_version,
