@@ -69,7 +69,7 @@ def test_run_fromfile(executable: List[str]):
         tf.flush()
         with open(tf.name) as ist:
             print(ist.read(), file=sys.stderr)
-        output = capture([*executable, f"@{tf.name}",], num_lines=5)
+        output = capture([*executable, f"@{tf.name}"], num_lines=5)
     assert output
     for line in output:
         readings = line.split()
