@@ -16,12 +16,13 @@ class ConfigArgumentParser(argparse.ArgumentParser):
         # Set the --prunq option
         prunq = 100.0*loadq/40/ncores
     """
+
     def convert_arg_line_to_args(self, arg_line):
-        arg_line, *_ = arg_line.split('#', 1)
+        arg_line, *_ = arg_line.split("#", 1)
         if not arg_line.strip():
             return []
-        key, _, value = [elem.strip() for elem in arg_line.partition('=')]
-        key = key if key.startswith('--') else ('--' + key)
+        key, _, value = [elem.strip() for elem in arg_line.partition("=")]
+        key = key if key.startswith("--") else ("--" + key)
         return [key, value] if value else [key]
 
 
@@ -62,7 +63,7 @@ CLI = ConfigArgumentParser(
         "The paging load exists for historical reasons; "
         "it cannot be reliably computed."
     ),
-    fromfile_prefix_chars='@',
+    fromfile_prefix_chars="@",
 )
 CLI.add_argument(
     "--version", action="version", version=lib_version,
