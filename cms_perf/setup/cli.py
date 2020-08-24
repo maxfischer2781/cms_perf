@@ -70,39 +70,39 @@ CLI.add_argument(
 )
 CLI.add_argument(
     "--interval",
-    default=60,
-    help="Interval between output; suffixed by s (default), m, or h",
+    default='60s',
+    help="Interval between output; suffixed by s, m, or h [default: %(default)s]",
     type=duration,
 )
 CLI.add_argument(
     "--prunq",
     default="100.0*loadq/ncores",
     type=cli_parser.parse_sensor,
-    help="Expression to compute system load percentage",
+    help="Expression to compute system load percentage [default: %(default)s]",
 )
 CLI.add_argument(
     "--pcpu",
     default="pcpu",
     type=cli_parser.parse_sensor,
-    help="Expression to compute cpu utilization percentage",
+    help="Expression to compute cpu utilization percentage [default: %(default)s]",
 )
 CLI.add_argument(
     "--pmem",
     default="pmem",
     type=cli_parser.parse_sensor,
-    help="Expression to compute memory utilization percentage",
+    help="Expression to compute memory utilization percentage [default: %(default)s]",
 )
 CLI.add_argument(
     "--ppag",
     default="0",
     type=cli_parser.parse_sensor,
-    help="Expression to compute paging load percentage",
+    help="Expression to compute paging load percentage [default: %(default)s]",
 )
 CLI.add_argument(
     "--pio",
     default="pio",
     type=cli_parser.parse_sensor,
-    help="Expression to compute network utilization percentage",
+    help="Expression to compute network utilization percentage [default: %(default)s]",
 )
 CLI.add_argument(
     "--sched",
