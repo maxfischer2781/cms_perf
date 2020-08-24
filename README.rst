@@ -18,6 +18,10 @@ Sensor for use in the XRootD ``cms.perf`` directive.
 Measures system load, as well as cpu, memory, and network utilization,
 to enable load-balancing in a cluster of multiple XRootD servers.
 
+With its support for individual re-configuration of each sensor reading,
+``cms_perf`` allows to fine-tune or even re-define load reporting to your needs.
+No need to hack any scripts, just install, configure, run.
+
 Installation and Usage
 ======================
 
