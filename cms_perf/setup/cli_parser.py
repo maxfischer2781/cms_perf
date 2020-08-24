@@ -278,7 +278,7 @@ def minimum(a, b, *others):
 
 if __name__ == "__main__":
     # provide debug information on the parser
-    from . import sensor, net_load, xrd_load  # noqa
+    from ..sensors import sensor, net_load, xrd_load  # noqa
     from . import cli_parser  # noqa
 
     print("EXPRESSION:", cli_parser.EXPRESSION)

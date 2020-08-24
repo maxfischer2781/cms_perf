@@ -1,7 +1,7 @@
 import pytest
 import psutil
 
-from cms_perf import xrd_load
+from cms_perf.sensors import xrd_load
 
 from . import mimicry
 

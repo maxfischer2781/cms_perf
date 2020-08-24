@@ -11,7 +11,7 @@ import enum
 
 import psutil
 
-from .cli_parser import cli_call, cli_domain
+from ..setup.cli_parser import cli_call, cli_domain
 
 
 # individual sensors for system state

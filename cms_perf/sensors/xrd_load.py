@@ -1,12 +1,12 @@
 """
-P
+Sensors for resources used by XRootD processes
 """
 from typing import List
 import time
 
 import psutil
 
-from .cli_parser import cli_call
+from ..setup.cli_parser import cli_call
 
 
 def rescan(interval):

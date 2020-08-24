@@ -3,6 +3,7 @@ import sys
 
 import pytest
 import coverage
+import tempfile
 
 from .utility import capture
 from . import mimicry
@@ -43,6 +44,32 @@ def test_run_replaced(executable: List[str]):
         ],
         num_lines=5,
     )
+    assert output
+    for line in output:
+        readings = line.split()
+        assert len(readings) == 5
+        for idx, reading in enumerate(readings):
+            assert idx == int(reading)
+
+
+@pytest.mark.parametrize("executable", EXECUTABLES)
+def test_run_fromfile(executable: List[str]):
+    with tempfile.NamedTemporaryFile() as tf:
+        tf.writelines(
+            [
+                b"interval=0.02\n",
+                b"# this is ignored\n",
+                b"prunq = 0\n",
+                b"pcpu= 1\n",
+                b"pmem =2\n",
+                b"ppag=3\n",
+                b"pio = 4\n",
+            ]
+        )
+        tf.flush()
+        with open(tf.name) as ist:
+            print(ist.read(), file=sys.stderr)
+        output = capture([*executable, f"@{tf.name}"], num_lines=5)
     assert output
     for line in output:
         readings = line.split()

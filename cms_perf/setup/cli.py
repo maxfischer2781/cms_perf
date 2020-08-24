@@ -1,12 +1,29 @@
 import argparse
 
-from . import cli_parser
-from . import __version__ as lib_version
+from ..setup import cli_parser
+from .. import __version__ as lib_version
 
 # ensure sensors are loaded
-from . import sensor  # noqa
-from . import xrd_load  # noqa
-from . import net_load  # noqa
+from ..sensors import sensor, xrd_load, net_load  # noqa
+
+
+class ConfigArgumentParser(argparse.ArgumentParser):
+    """
+    Custom parser for ini-style config files, provided as ``@/path/to/config``
+
+    Allows comments and the use of key value notation, as in::
+
+        # Set the --prunq option
+        prunq = 100.0*loadq/40/ncores
+    """
+
+    def convert_arg_line_to_args(self, arg_line):
+        arg_line, *_ = arg_line.split("#", 1)
+        if not arg_line.strip():
+            return []
+        key, _, value = [elem.strip() for elem in arg_line.partition("=")]
+        key = key if key.startswith("--") else ("--" + key)
+        return [key, value] if value else [key]
 
 
 INTERVAL_UNITS = {"": 1, "s": 1, "m": 60, "h": 60 * 60}
@@ -34,7 +51,7 @@ def duration(literal: str) -> float:
     return float(value) * scale
 
 
-CLI = argparse.ArgumentParser(
+CLI = ConfigArgumentParser(
     description="Performance Sensor for XRootD cms.perf directive",
     epilog=(
         "In regular intervals, outputs a single line with percentages of: "
@@ -46,45 +63,46 @@ CLI = argparse.ArgumentParser(
         "The paging load exists for historical reasons; "
         "it cannot be reliably computed."
     ),
+    fromfile_prefix_chars="@",
 )
 CLI.add_argument(
     "--version", action="version", version=lib_version,
 )
 CLI.add_argument(
     "--interval",
-    default=60,
-    help="Interval between output; suffixed by s (default), m, or h",
+    default="60s",
+    help="Interval between output; suffixed by s, m, or h [default: %(default)s]",
     type=duration,
 )
 CLI.add_argument(
     "--prunq",
     default="100.0*loadq/ncores",
     type=cli_parser.parse_sensor,
-    help="Expression to compute system load percentage",
+    help="Expression to compute system load percentage [default: %(default)s]",
 )
 CLI.add_argument(
     "--pcpu",
     default="pcpu",
     type=cli_parser.parse_sensor,
-    help="Expression to compute cpu utilization percentage",
+    help="Expression to compute cpu utilization percentage [default: %(default)s]",
 )
 CLI.add_argument(
     "--pmem",
     default="pmem",
     type=cli_parser.parse_sensor,
-    help="Expression to compute memory utilization percentage",
+    help="Expression to compute memory utilization percentage [default: %(default)s]",
 )
 CLI.add_argument(
     "--ppag",
     default="0",
     type=cli_parser.parse_sensor,
-    help="Expression to compute paging load percentage",
+    help="Expression to compute paging load percentage [default: %(default)s]",
 )
 CLI.add_argument(
     "--pio",
     default="pio",
     type=cli_parser.parse_sensor,
-    help="Expression to compute network utilization percentage",
+    help="Expression to compute network utilization percentage [default: %(default)s]",
 )
 CLI.add_argument(
     "--sched",

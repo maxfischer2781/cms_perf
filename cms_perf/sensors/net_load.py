@@ -5,7 +5,7 @@ import enum
 
 import psutil
 
-from .cli_parser import cli_domain, cli_call
+from ..setup.cli_parser import cli_domain, cli_call
 
 
 @cli_domain(name="KIND")

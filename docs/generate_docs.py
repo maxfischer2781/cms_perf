@@ -2,9 +2,7 @@ from pathlib import Path
 import inspect
 import textwrap
 
-from cms_perf import cli
-from cms_perf import cli_parser
-
+from cms_perf.setup import cli_parser, cli
 
 TARGET_DIR = Path(__file__).parent / "generated"
 TARGET_DIR.mkdir(exist_ok=True)
@@ -17,7 +15,7 @@ def normalized_doc(obj):
 def document_cli_sensors():
     rst_lines = []
     for action in cli.CLI._actions:
-        if action.type != cli.cli_parser.parse_sensor:
+        if action.type != cli_parser.parse_sensor:
             continue
         cli_name = max(action.option_strings, key=len)
         rst_lines.append(f"``{cli_name}={action.default}``\n   {action.help}\n")

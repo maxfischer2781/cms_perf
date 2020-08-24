@@ -77,6 +77,43 @@ Use the same interval for the directive's ``int`` and the sensor's ``--interval`
 
 See the `cms.perf documentation`_ for details of the directive.
 
+Sensor Configuration
+====================
+
+The ``cms_perf`` sensor can be configured for report interval,
+:doc:`load sensors <./setup>` and :doc:`cms.sched emulation <./sched>`.
+The CLI supports both directly specified options as well as
+ini-style configuration files.
+
+.. tabs::
+
+    .. group-tab:: Explicit Option
+
+        .. code::
+
+            cms_perf --interval 10
+
+    .. group-tab:: Configuration File
+
+        .. code::
+
+            cms_perf @/etc/cms_perf.ini
+
+The configuration file uses ``option = value``
+when the CLI would use ``--option value``.
+Only one option per line is allowed;
+``#`` marks comments for the rest of the line and empty lines are ignored.
+
+.. code::
+
+    interval = 60s
+    # Redefine prunq and ppag based on machine size
+    prunq = 100.0*loadq/10/ncores
+    pcpu = pcpu
+    pmem = pmem
+    ppag = 100.0*nsockets/250/ncores
+    pio = pio
+
 .. _virtual environment: https://docs.python.org/3/library/venv.html
 .. _psutil documentation: https://psutil.readthedocs.io/
 .. _cms.perf documentation: https://xrootd.slac.stanford.edu/doc/dev410/cms_config.htm#_Toc8247264

@@ -4,8 +4,8 @@ import platform
 
 import psutil
 
-from cms_perf import cli_parser
-from cms_perf import (  # noqa
+from cms_perf.setup import cli_parser
+from cms_perf.sensors import (  # noqa
     sensor as _mount_sensors,
     net_load as _mount_net_load,
     xrd_load as _mount_xrd_load,
