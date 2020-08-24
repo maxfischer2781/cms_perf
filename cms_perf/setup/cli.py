@@ -70,7 +70,7 @@ CLI.add_argument(
 )
 CLI.add_argument(
     "--interval",
-    default='60s',
+    default="60s",
     help="Interval between output; suffixed by s, m, or h [default: %(default)s]",
     type=duration,
 )
