@@ -99,7 +99,7 @@ ini-style configuration files.
 
             cms_perf @/etc/cms_perf.ini
 
-The configuration files uses ``option = value``
+The configuration file uses ``option = value``
 when the CLI would use ``--option value``.
 Only one option per line is allowed;
 ``#`` marks comments for the rest of the line and empty lines are ignored.
@@ -107,7 +107,7 @@ Only one option per line is allowed;
 .. code::
 
     interval = 60s
-    # Redefine prunq and ppag for several tasks per core
+    # Redefine prunq and ppag based on machine size
     prunq = 100.0*loadq/10/ncores
     pcpu = pcpu
     pmem = pmem
