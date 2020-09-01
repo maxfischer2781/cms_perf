@@ -66,7 +66,9 @@ CLI = ConfigArgumentParser(
     fromfile_prefix_chars="@",
 )
 CLI.add_argument(
-    "--version", action="version", version=lib_version,
+    "--version",
+    action="version",
+    version=lib_version,
 )
 CLI.add_argument(
     "--interval",
