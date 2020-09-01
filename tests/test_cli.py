@@ -76,6 +76,32 @@ def test_run_fromfile(executable: List[str]):
             assert idx == int(reading)
 
 
+@pytest.mark.parametrize("executable", EXECUTABLES)
+def test_run_mixed_fromfile(executable: List[str]):
+    with tempfile.NamedTemporaryFile() as tf:
+        tf.writelines(
+            [
+                b"interval=5\n  # to be overridden by CLI",
+                b"# this is ignored\n",
+                b"prunq = 0\n",
+                b"pcpu= 1\n",
+                b"pmem =2\n",
+                b"ppag=3\n",
+                b"pio = 4\n",
+            ]
+        )
+        tf.flush()
+        output = capture(
+            [*executable, f"@{tf.name}", "--interval", "0.02"], num_lines=5
+        )
+    assert output
+    for line in output:
+        readings = line.split()
+        assert len(readings) == 5
+        for idx, reading in enumerate(readings):
+            assert idx == int(reading)
+
+
 SCHED_FIELD = tuple(enumerate(("runq", "cpu", "mem", "pag", "io")))
 
 
