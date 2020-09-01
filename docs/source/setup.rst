@@ -114,6 +114,11 @@ Only one option per line is allowed;
     ppag = 100.0*nsockets/250/ncores
     pio = pio
 
+Both CLI and file options are processed in-order,
+with later settings replacing earlier ones.
+For example, this allows to use a configuration file for defaults
+and CLI options for specific settings.
+
 .. _virtual environment: https://docs.python.org/3/library/venv.html
 .. _psutil documentation: https://psutil.readthedocs.io/
 .. _cms.perf documentation: https://xrootd.slac.stanford.edu/doc/dev410/cms_config.htm#_Toc8247264
