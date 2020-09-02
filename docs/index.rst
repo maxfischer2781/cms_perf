@@ -19,6 +19,9 @@
     :alt: License
     :target: https://github.com/maxfischer2781/cms_perf/blob/master/LICENSE
 
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.4011821.svg
+   :target: https://doi.org/10.5281/zenodo.4011821
+
 .. toctree::
    :maxdepth: 2
    :hidden:

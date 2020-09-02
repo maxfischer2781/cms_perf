@@ -14,6 +14,9 @@
     :alt: License
     :target: https://github.com/maxfischer2781/cms_perf/blob/master/LICENSE
 
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.4011821.svg
+   :target: https://doi.org/10.5281/zenodo.4011821
+
 Sensor for use in the XRootD ``cms.perf`` directive.
 Measures system load, as well as cpu, memory, and network utilization,
 to enable load-balancing in a cluster of multiple XRootD servers.
