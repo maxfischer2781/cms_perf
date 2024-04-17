@@ -4,7 +4,7 @@ from ..setup import cli_parser
 from .. import __version__ as lib_version
 
 # ensure sensors are loaded
-from ..sensors import sensor, xrd_load, net_load  # noqa
+from ..sensors import sensor, xrd_load, net_load  # noqa  # pyright: ignore
 
 
 class ConfigArgumentParser(argparse.ArgumentParser):
@@ -17,7 +17,7 @@ class ConfigArgumentParser(argparse.ArgumentParser):
         prunq = 100.0*loadq/40/ncores
     """
 
-    def convert_arg_line_to_args(self, arg_line):
+    def convert_arg_line_to_args(self, arg_line: str) -> list[str]:
         arg_line, *_ = arg_line.split("#", 1)
         if not arg_line.strip():
             return []
@@ -26,7 +26,14 @@ class ConfigArgumentParser(argparse.ArgumentParser):
         return [key, value] if value else [key]
 
 
-INTERVAL_UNITS = {"": 1, "s": 1, "m": 60, "h": 60 * 60}
+INTERVAL_UNITS = {
+    "": 1,
+    "s": 1,
+    "m": 60,
+    "h": 60 * 60,
+    "d": 60 * 60 * 24,
+    "w": 60 * 60 * 24 * 7,
+}
 
 
 def duration(literal: str) -> float:
@@ -35,7 +42,7 @@ def duration(literal: str) -> float:
 
     A literal consists of a float literal, e.g. ``12`` or ``17.5``,
     and an optional unit ``s`` (for seconds), ``m`` (for minutes),
-    or ``h`` (for hours). If no unit is given, ``s`` is assumed.
+    and so on. If no unit is given, ``s`` is assumed.
     """
     literal = literal.strip()
     value, unit = (
