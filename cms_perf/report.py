@@ -13,7 +13,15 @@ from .setup import cli_parser
 class PseudoSched:
     """Imitation of the ``cms.sched`` directive to compute total load"""
 
-    def __init__(self, cpu=0, io=0, mem=0, pag=0, runq=0, maxload=100):
+    def __init__(
+        self,
+        cpu: int = 0,
+        io: int = 0,
+        mem: int = 0,
+        pag: int = 0,
+        runq: int = 0,
+        maxload: int = 100,
+    ):
         self.cpu = cpu
         self.io = io
         self.mem = mem
@@ -74,7 +82,7 @@ def run_forever(
     pcpu: Callable[[], float],
     ppag: Callable[[], float],
     pio: Callable[[], float],
-    sched: PseudoSched = None,
+    sched: "PseudoSched | None" = None,
 ):
     """Write sensor information to stdout every ``interval`` seconds"""
     sensors = (prunq, pcpu, pmem, ppag, pio)
