@@ -64,9 +64,9 @@ def every(interval: float):
     plus the pause time equals ``interval`` as closely as possible.
     """
     while True:
-        suspended = time.time()
+        suspended = time.monotonic()
         yield
-        duration = time.time() - suspended
+        duration = time.monotonic() - suspended
         time.sleep(max(0.1, interval - duration))
 
 

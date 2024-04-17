@@ -67,13 +67,13 @@ class XrootdTracker:
                 for proc in psutil.process_iter()
                 if proc.name() == "xrootd" and is_alive(proc)
             ]
-            self._next_scan = time.time() + self.rescan_interval
+            self._next_scan = time.monotonic() + self.rescan_interval
         return self._xrootd_procs
 
     def _refresh_xrootds(self) -> bool:
         return (
             not self._xrootd_procs
-            or time.time() > self._next_scan
+            or time.monotonic() > self._next_scan
             or not all(is_alive(proc) for proc in self._xrootd_procs)
         )
 
