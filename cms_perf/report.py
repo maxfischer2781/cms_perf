@@ -89,18 +89,22 @@ def run_forever(
     try:
         for _ in every(interval):
             values = [clamp_percentages(sensor()) for sensor in sensors]
-            print(*values, end="", flush=True)
-            if sched is not None:
-                load, rejected = sched.weight(*values)
-                print(
-                    f" {load}{'!' if rejected else ''}",
-                    end="",
-                    file=sys.stderr,
-                    flush=True,
-                )
-            print(flush=True)
+            report_one(values, sched)
     except KeyboardInterrupt:
         pass
+
+
+def report_one(values: "list[int]", sched: "PseudoSched | None" = None) -> None:
+    print(*values, end="", flush=True)
+    if sched is not None:
+        load, rejected = sched.weight(*values)
+        print(
+            f" {load}{'!' if rejected else ''}",
+            end="",
+            file=sys.stderr,
+            flush=True,
+        )
+    print(flush=True)
 
 
 def main():
