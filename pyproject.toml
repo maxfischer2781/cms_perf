@@ -22,7 +22,9 @@ cms_perf = "cms_perf.report:main"
 
 [tool.flit.metadata.requires-extra]
 test = [
-    "pytest >=4.3.0",
+    "pytest",
+    "coverage",
+    "pytest-cov",
     "codecov",
     "flake8",
     "flake8-bugbear",
