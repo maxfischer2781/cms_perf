@@ -1,6 +1,7 @@
 """
 The main loop collecting and reporting values
 """
+
 from typing import Callable
 import sys
 import time

@@ -6,6 +6,7 @@ Sensors for the canonical cms.perf measurements
     The paging load has no canonical meaning anymore.
     It exists for backwards compatibility but is assumed 0.
 """
+
 import time
 import enum
 

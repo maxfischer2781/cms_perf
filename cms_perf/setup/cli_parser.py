@@ -10,6 +10,7 @@ and everything compiles down to Python source code.
 The math part is an explicitly defined.
 Both calls and constants are automatically generated from Python objects.
 """
+
 from typing import TypeVar, Optional, Dict, NamedTuple, List, Callable, Type
 from typing_extensions import Protocol
 import inspect
@@ -62,15 +63,13 @@ def parse(code: str) -> str:
 class CLICall(Protocol):
     """A callable that can be registered for the CLI to provide values"""
 
-    def __call__(self, *args, **kwargs) -> float:
-        ...
+    def __call__(self, *args, **kwargs) -> float: ...
 
 
 class Transform(Protocol):
     """A callable that can be registered for the CLI to transform values"""
 
-    def __call__(self, *args: float) -> float:
-        ...
+    def __call__(self, *args: float) -> float: ...
 
 
 S = TypeVar("S", bound=CLICall)

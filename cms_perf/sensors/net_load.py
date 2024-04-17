@@ -1,6 +1,7 @@
 """
 Sensor for network load
 """
+
 import enum
 
 import psutil
