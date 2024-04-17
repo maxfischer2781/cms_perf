@@ -77,10 +77,15 @@ Use the same interval for the directive's ``int`` and the sensor's ``--interval`
 
 See the `cms.perf documentation`_ for details of the directive.
 
+.. note::
+
+    Make sure to provide the same interval to both XRootD itself
+    and the ``cms_perf`` executable.
+
 Sensor Configuration
 ====================
 
-The ``cms_perf`` sensor can be configured for report interval,
+The ``cms_perf`` sensor can be configured for report interval and ramp up,
 :doc:`load sensors <./setup>` and :doc:`cms.sched emulation <./sched>`.
 The CLI supports both directly specified options as well as
 ini-style configuration files.
@@ -107,6 +112,7 @@ Only one option per line is allowed;
 .. code::
 
     interval = 60s
+    rampup = 10m
     # Redefine prunq and ppag based on machine size
     prunq = 100.0*loadq/10/ncores
     pcpu = pcpu

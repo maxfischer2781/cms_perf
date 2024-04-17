@@ -69,6 +69,7 @@ CLI = ConfigArgumentParser(
         "network utilization. "
         "The paging load exists for historical reasons; "
         "it cannot be reliably computed."
+        "Time can be suffixed with s, m, h, d or w."
     ),
     fromfile_prefix_chars="@",
 )
@@ -80,7 +81,13 @@ CLI.add_argument(
 CLI.add_argument(
     "--interval",
     default="60s",
-    help="Interval between output; suffixed by s, m, or h [default: %(default)s]",
+    help="Interval between output [default: %(default)s]",
+    type=duration,
+)
+CLI.add_argument(
+    "--rampup",
+    default="0s",
+    help="Duration in which usage is dampened [default: %(default)s]",
     type=duration,
 )
 CLI.add_argument(
