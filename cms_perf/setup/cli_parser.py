@@ -7,8 +7,8 @@ The syntax is loosely speaking:
 * constants such as enums
 and everything compiles down to Python source code.
 
-The math part is an explicitly defined.
-Both calls and constants are automatically generated from Python objects.
+The math part is an explicitly defined infix parser rule.
+The parts for both calls and constants are automatically generated from Python objects.
 """
 
 from typing import TypeVar, Optional, Dict, NamedTuple, List, Callable, Type
