@@ -80,7 +80,13 @@ CLI.add_argument(
 CLI.add_argument(
     "--interval",
     default="60s",
-    help="Interval between output; suffixed by s, m, or h [default: %(default)s]",
+    help="Interval between output; suffixed by s, m, h, d or w [default: %(default)s]",
+    type=duration,
+)
+CLI.add_argument(
+    "--rampup",
+    default="0s",
+    help="Duration in which usage is dampened; suffixed by s, m, h, d or w [default: %(default)s]",
     type=duration,
 )
 CLI.add_argument(

@@ -77,6 +77,7 @@ def clamp_percentages(value: float) -> int:
 
 def run_forever(
     interval: float,
+    rampup: float,
     prunq: Callable[[], float],
     pmem: Callable[[], float],
     pcpu: Callable[[], float],
@@ -87,11 +88,36 @@ def run_forever(
     """Write sensor information to stdout every ``interval`` seconds"""
     sensors = (prunq, pcpu, pmem, ppag, pio)
     try:
-        for _ in every(interval):
-            values = [clamp_percentages(sensor()) for sensor in sensors]
-            report_one(values, sched)
+        if rampup > 1.0:
+            report_rampup(interval, rampup, sched, *sensors)
+        report_forever(interval, sched, *sensors)
     except KeyboardInterrupt:
         pass
+
+
+def report_rampup(
+    interval: float,
+    rampup: float,
+    sched: "PseudoSched | None",
+    *sensors: Callable[[], float],
+) -> None:
+    start_time = time.monotonic()
+    for _ in every(interval):
+        values = [clamp_percentages(sensor()) for sensor in sensors]
+        weight = min((time.monotonic() - start_time) / rampup, 1.0)
+        report_one(
+            [int(value * weight + (1 - weight) * 100) for value in values], sched
+        )
+        if weight >= 1:
+            break
+
+
+def report_forever(
+    interval: float, sched: "PseudoSched | None", *sensors: Callable[[], float]
+) -> None:
+    for _ in every(interval):
+        values = [clamp_percentages(sensor()) for sensor in sensors]
+        report_one(values, sched)
 
 
 def report_one(values: "list[int]", sched: "PseudoSched | None" = None) -> None:
@@ -121,6 +147,7 @@ def main():
     sched = PseudoSched.from_directive(options.sched) if options.sched else None
     run_forever(
         interval=options.interval,
+        rampup=options.rampup,
         prunq=prunq,
         pcpu=pcpu,
         pmem=pmem,
