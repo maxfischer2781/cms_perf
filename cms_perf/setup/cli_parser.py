@@ -7,11 +7,11 @@ The syntax is loosely speaking:
 * constants such as enums
 and everything compiles down to Python source code.
 
-The math part is an explicitly defined.
-Both calls and constants are automatically generated from Python objects.
+The math part is an explicitly defined infix parser rule.
+The parts for both calls and constants are automatically generated from Python objects.
 """
+
 from typing import TypeVar, Optional, Dict, NamedTuple, List, Callable, Type
-from typing_extensions import Protocol
 import inspect
 import enum
 
@@ -21,21 +21,23 @@ pp.ParserElement.enablePackrat()
 
 
 # Auto-generated expressions
-GENERATED = pp.Forward().setName("TERM")
+GENERATED: pp.Forward = pp.Forward().setName("TERM")  # type: ignore
 
 
 # Number literals – float should be precise enough for everything
 NUMBER = pp.Regex(r"-?\d+\.?\d*").setName("NUMBER")
 
 
-@NUMBER.setParseAction
+@NUMBER.setParseAction  # type: ignore
 def transpile(result: pp.ParseResults) -> str:
-    return result[0]
+    """Capture float literals directly"""
+    return result[0]  # type: ignore
 
 
 # Mathematical Operators
-def transpile_binop(result: pp.ParseResults):
-    (*terms,) = result[0]
+def transpile_binop(result: pp.ParseResults) -> str:
+    """Capture binary operations such as ``12 * b`` and add precedence via ``()``"""
+    terms = list(result[0])  # type: ignore
     return f"({' '.join(terms)})"
 
 
@@ -51,7 +53,7 @@ EXPRESSION = pp.infixNotation(
 def parse(code: str) -> str:
     """Parse a CLI code string to Python source code"""
     try:
-        return EXPRESSION.parseString(code, parseAll=True)[0]
+        return EXPRESSION.parseString(code, parseAll=True)[0]  # type: ignore
     except pp.ParseException as pe:
         raise SyntaxError(
             str(pe), ("<cms_perf.cli_parser code>", pe.col, pe.loc, code)
@@ -59,29 +61,22 @@ def parse(code: str) -> str:
 
 
 # Sensor Plugins
-class CLICall(Protocol):
-    """A callable that can be registered for the CLI to provide values"""
-
-    def __call__(self, *args, **kwargs) -> float:
-        ...
-
-
-class Transform(Protocol):
-    """A callable that can be registered for the CLI to transform values"""
-
-    def __call__(self, *args: float) -> float:
-        ...
+CLICall = Callable[..., float]
 
 
 S = TypeVar("S", bound=CLICall)
 
 
 class CallInfo(NamedTuple):
+    """Information for running `cli_name(...)` via `call`"""
+
     call: Callable[..., float]
     cli_name: str
 
 
 class DomainInfo(NamedTuple):
+    """Information for translating literal of `cli_name` in a type `domain`"""
+
     domain: type
     cli_name: str
     parser: pp.ParserElement
@@ -95,8 +90,10 @@ KNOWN_DOMAINS_MAP: Dict[type, DomainInfo] = {}
 
 
 # automatic parser generation
-def _extend_generated(*rules, base=GENERATED):
-    base << pp.MatchFirst((*(base.expr.exprs if base.expr else ()), *rules))
+def _extend_generated(*rules: pp.ParserElement, base: pp.Forward = GENERATED):
+    base <<= pp.MatchFirst(
+        (*(base.expr.exprs if base.expr else ()), *rules)  # type:ignore
+    )
 
 
 _COMPILEABLE_PARAMETERS = (
@@ -119,16 +116,21 @@ def _compile_parameter(parameter: inspect.Parameter):
     return EXPRESSION.copy().setName(f"{parameter.name}=TERM")
 
 
-def _compile_cli_call(call_name: str, transpiled_name: str, call: Callable):
+def _compile_cli_call(
+    call_name: str, transpiled_name: str, call: CLICall
+) -> "list[pp.ParserElement]":
     """Compile a call with a given argument arity to a transpile expression"""
-    transpilers = []
+    transpilers: "list[pp.ParserElement]" = []
     parameters = inspect.signature(call).parameters
     implicit_interval = "interval" in parameters
     if implicit_interval:
-        assert next(iter(parameters)) == "interval", "interval must be first"
+        assert (
+            next(iter(parameters)) == "interval"
+        ), "interval must be the first parameter"
         parameters = {k: v for k, v in parameters.items() if k != "interval"}
     for parameter in parameters.values():
         assert parameter.kind in _COMPILEABLE_PARAMETERS, f"Cannot compile {parameter}"
+    # if all parameters are optional, allow call without arguments
     if all(
         param.default is not inspect.Parameter.empty
         or param.kind == inspect.Parameter.VAR_POSITIONAL
@@ -136,19 +138,22 @@ def _compile_cli_call(call_name: str, transpiled_name: str, call: Callable):
     ):
         default_call = pp.Suppress(call_name).setName(f'"{call_name}"')
 
-        @default_call.setParseAction
-        def transpile_default(result: pp.ParseResults) -> str:
+        @default_call.setParseAction  # type: ignore
+        def transpile_default(result: pp.ParseResults) -> str:  # type: ignore[reportUnusedFunction]
             arguments = "interval" if implicit_interval else ""
             return f"{transpiled_name}({arguments})"
 
         transpilers.append(default_call)
+    # if parameters may be passed, allow call with parametrised arguments
     if len(parameters):
-        argument_parsers = []
+        argument_parsers: "list[pp.ParserElement]" = []
         for parameter in parameters.values():
+            # individual parameter
             if parameter.kind != inspect.Parameter.VAR_POSITIONAL:
                 if argument_parsers:
                     argument_parsers.append(pp.Suppress(","))
                 argument_parsers.append(_compile_parameter(parameter))
+            # variadic parameter, compile to a list of parameters
             else:
                 param_parser = pp.delimitedList(_compile_parameter(parameter))
                 if argument_parsers:
@@ -160,8 +165,8 @@ def _compile_cli_call(call_name: str, transpiled_name: str, call: Callable):
         signature = pp.And((LEFT_PAR, *argument_parsers, RIGHT_PAR))
         parameter_call = pp.Suppress(call_name).setName(f'"{call_name}"') + signature
 
-        @parameter_call.setParseAction
-        def transpile_with_args(result: pp.ParseResults) -> str:
+        @parameter_call.setParseAction  # type: ignore
+        def transpile_with_args(result: pp.ParseResults) -> str:  # type: ignore[reportUnusedFunction]
             arguments = ("interval, " if implicit_interval else "") + ", ".join(result)
             return f"{transpiled_name}({arguments})"
 
@@ -170,7 +175,7 @@ def _compile_cli_call(call_name: str, transpiled_name: str, call: Callable):
 
 
 # registration decorators
-def cli_call(name: Optional[str] = None):
+def cli_call(name: Optional[str] = None) -> Callable[[S], S]:
     """
     Register a sensor or transformation for the CLI with its own name or ``name``
     """
@@ -184,7 +189,8 @@ def cli_call(name: Optional[str] = None):
 
 
 def _register_cli_callable(call: S, cli_name: Optional[str]) -> S:
-    cli_name = cli_name if cli_name is not None else call.__name__
+    cli_name = cli_name if cli_name is not None else call.__name__  # type: ignore
+    assert isinstance(cli_name, str)
     source_name = cli_name.replace(".", "_")
     assert (
         source_name not in KNOWN_CALLABLES
@@ -206,8 +212,8 @@ def cli_domain(name: Optional[str] = None):
         if issubclass(domain, enum.Enum):
             _register_enum(domain, name)
         else:
-            raise TypeError(f"Cannot register CLI domain: {domain}")
-        return domain
+            raise TypeError(f"Can only register Enum domain, not {domain}")
+        return domain  # type: ignore
 
     return register
 
@@ -223,9 +229,9 @@ def _register_enum(domain: Type[enum.Enum], cli_name: Optional[str]):
         " | ".join(f'"{case}"' for case in cases)
     )
 
-    @match_case.setParseAction
-    def transpile_enum_case(result: pp.ParseResults):
-        (case,) = result
+    @match_case.setParseAction  # type: ignore
+    def transpile_enum_case(result: pp.ParseResults) -> str:  # type: ignore[reportUnusedFunction]
+        case: str = result[0]  # type: ignore
         return f"{source_name}['{case}']"
 
     KNOWN_DOMAINS_MAP[domain] = KNOWN_DOMAINS[source_name] = DomainInfo(
@@ -257,7 +263,7 @@ def compile_sensors(
     interval: float, *sensors: Callable[..., Callable[[], float]]
 ) -> List[Callable[[], float]]:
     raw_sensors = {name: sf_info.call for name, sf_info in KNOWN_CALLABLES.items()}
-    raw_domains = {name: dm_info.domain for name, dm_info in KNOWN_DOMAINS.items()}
+    raw_domains = {name: dm_info.domain for name, dm_info in KNOWN_DOMAINS.items()}  # type: ignore[reportUnknownMemberType]
     return [
         factory(interval=interval, **raw_sensors, **raw_domains) for factory in sensors
     ]
@@ -265,20 +271,20 @@ def compile_sensors(
 
 # CLI transformations
 @cli_call(name="max")
-def maximum(a, b, *others):
+def maximum(a: float, b: float, *others: float) -> float:
     """The maximum value of all arguments"""
     return max(a, b, *others)
 
 
 @cli_call(name="min")
-def minimum(a, b, *others):
+def minimum(a: float, b: float, *others: float):
     """The minimum value of all arguments"""
     return min(a, b, *others)
 
 
 if __name__ == "__main__":
     # provide debug information on the parser
-    from ..sensors import sensor, net_load, xrd_load  # noqa
+    from ..sensors import sensor, net_load, xrd_load  # noqa  # pyright: ignore
     from . import cli_parser  # noqa
 
     print("EXPRESSION:", cli_parser.EXPRESSION)

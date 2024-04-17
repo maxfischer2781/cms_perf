@@ -1,16 +1,13 @@
 """
 Sensors for resources used by XRootD processes
 """
+
 from typing import List
 import time
 
 import psutil
 
 from ..setup.cli_parser import cli_call
-
-
-def rescan(interval):
-    return min(interval * 10, 3600)
 
 
 @cli_call(name="xrd.piowait")
@@ -35,15 +32,20 @@ def xrd_threads(interval: float) -> float:
 
 
 def cached_tracker(interval: float):
+    # how often the tracker scans for processes
+    rescan_interval = max(
+        60,
+        int(min(interval * 10, 3600)) // 10 * 10,
+    )
     try:
-        return TRACKER_CACHE[interval]
+        return TRACKER_CACHE[rescan_interval]
     except KeyError:
-        tracker = XrootdTracker(rescan_interval=rescan(interval))
-        TRACKER_CACHE[interval] = tracker
+        tracker = XrootdTracker(rescan_interval=rescan_interval)
+        TRACKER_CACHE[rescan_interval] = tracker
         return tracker
 
 
-TRACKER_CACHE = {}
+TRACKER_CACHE: "dict[float, XrootdTracker]" = {}
 
 
 def is_alive(proc: psutil.Process) -> bool:
@@ -65,18 +67,21 @@ class XrootdTracker:
                 for proc in psutil.process_iter()
                 if proc.name() == "xrootd" and is_alive(proc)
             ]
-            self._next_scan = time.time() + self.rescan_interval
+            self._next_scan = time.monotonic() + self.rescan_interval
         return self._xrootd_procs
 
-    def _refresh_xrootds(self):
+    def _refresh_xrootds(self) -> bool:
         return (
             not self._xrootd_procs
-            or time.time() > self._next_scan
+            or time.monotonic() > self._next_scan
             or not all(is_alive(proc) for proc in self._xrootd_procs)
         )
 
     def io_wait(self) -> float:
-        return max((xrd.cpu_times().iowait for xrd in self.xrootds), default=0)
+        return max(
+            (xrd.cpu_times().iowait for xrd in self.xrootds),  # type: ignore
+            default=0,
+        )
 
     def num_fds(self) -> int:
         return sum(xrd.num_fds() for xrd in self.xrootds)
