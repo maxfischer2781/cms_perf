@@ -21,7 +21,7 @@ jobs:
         pip install .[test,typetest]
     - name: Lint with flake8
       run: |
-        flake8 asyncstdlib unittests
+        flake8 cms_perf tests
     - name: Format with black
       run: |
-        black asyncstdlib unittests --diff --check
+        black cms_perf tests --diff --check
