@@ -17,7 +17,7 @@ class ConfigArgumentParser(argparse.ArgumentParser):
         prunq = 100.0*loadq/40/ncores
     """
 
-    def convert_arg_line_to_args(self, arg_line: str) -> list[str]:
+    def convert_arg_line_to_args(self, arg_line: str) -> "list[str]":
         arg_line, *_ = arg_line.split("#", 1)
         if not arg_line.strip():
             return []
