@@ -2,8 +2,8 @@
 ``cms_perf`` - XRootD load sensor
 =================================
 
-.. image:: https://readthedocs.org/projects/cms_perf/badge/?version=latest
-    :target: http://cms_perf.readthedocs.io/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/cms-perf/badge/?version=latest
+    :target: http://cms-perf.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
 .. image:: https://img.shields.io/pypi/v/cms_perf.svg

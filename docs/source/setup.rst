@@ -80,7 +80,7 @@ See the `cms.perf documentation`_ for details of the directive.
 .. note::
 
     Make sure to provide the same interval to both XRootD itself
-    and the `cms_perf` executable.
+    and the ``cms_perf`` executable.
 
 Sensor Configuration
 ====================
