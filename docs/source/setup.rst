@@ -104,6 +104,15 @@ ini-style configuration files.
 
             cms_perf @/etc/cms_perf.ini
 
+The following general options are supported:
+
+.. include:: ../generated/cli_options.rst
+
+See the :doc:`cli_lang` guide for details of sensor options.
+
+Configuration File Format
+-------------------------
+
 The configuration file uses ``option = value``
 when the CLI would use ``--option value``.
 Only one option per line is allowed;
