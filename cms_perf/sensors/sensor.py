@@ -86,3 +86,9 @@ def system_ncpu(kind: CpuKind = CpuKind.all) -> float:
     It defaults to ``all``.
     """
     return float(psutil.cpu_count(logical=kind is CpuKind.all))
+
+
+@cli_call(name="pswap")
+def system_pswap(interval: float) -> float:
+    """Percentage of swap utilisation"""
+    return psutil.swap_memory().percent
