@@ -1,5 +1,5 @@
 """
-Sensors for the canonical cms.perf measurements
+Sensors for the canonical cms.perf and related measurements
 
 .. note::
 
