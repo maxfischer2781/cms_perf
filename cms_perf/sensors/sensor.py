@@ -82,7 +82,7 @@ def system_ncpu(kind: CpuKind = CpuKind.all) -> float:
     """
     Number of CPU cores, by default including logical cores as well
 
-    ``kind`` selects which cores to count, and may one of ``all`` or ``physical``.
+    ``kind`` selects which cores to count, and may be one of ``all`` or ``physical``.
     It defaults to ``all``.
     """
     return float(psutil.cpu_count(logical=kind is CpuKind.all))
