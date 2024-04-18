@@ -29,7 +29,8 @@ def document_cli_sensors() -> str:
             if r"%(default)s" not in action.help
             else action.help
         )
-        rst_lines.append(f"``{cli_name}``\n   {cli_help % action.default}\n")
+        default = dict(default=f"``{action.default}``")
+        rst_lines.append(f"``{cli_name}``\n   {cli_help % default}\n")
     return "\n".join(rst_lines)
 
 
