@@ -16,11 +16,11 @@ def normalized_doc(obj: object) -> str:
     return textwrap.dedent(obj.__doc__ or "").strip()
 
 
-def document_cli_sensors() -> str:
-    """Create the RST for all CLI sensor options"""
+def document_cli(*, sensors: bool) -> str:
+    """Create the RST for all CLI sensor or other options"""
     rst_lines: "list[str]" = []
     for action in cli.CLI._actions:
-        if action.type != cli_parser.parse_sensor:
+        if (action.type != cli_parser.parse_sensor) == sensors:
             continue
         cli_name = max(action.option_strings, key=len)
         assert action.help is not None, "all CLI options must have a 'help' text"
@@ -75,7 +75,11 @@ def document_cli_calls() -> str:
 
 
 with open(TARGET_DIR / "cli_sensors.rst", "w") as out_stream:
-    out_stream.write(document_cli_sensors())
+    out_stream.write(document_cli(sensors=True))
+
+
+with open(TARGET_DIR / "cli_options.rst", "w") as out_stream:
+    out_stream.write(document_cli(sensors=False))
 
 
 with open(TARGET_DIR / "cli_callables.rst", "w") as out_stream:
