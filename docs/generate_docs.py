@@ -5,6 +5,7 @@ Write RST files for the CLI options and parser elements
 from pathlib import Path
 import inspect
 import textwrap
+import argparse
 
 from cms_perf.setup import cli_parser, cli
 
@@ -27,6 +28,7 @@ def document_cli(*, sensors: bool) -> str:
         cli_help = (
             action.help + r" [default: %(default)s]"
             if r"%(default)s" not in action.help
+            and action.default is not argparse.SUPPRESS
             else action.help
         )
         default = dict(default=f"``{action.default}``")
