@@ -74,9 +74,14 @@ def test_known_sensor_calls(expected: float, source: str):
 
 
 KNOWN_TRANSFORMS = [
+    # min/max transforms
     (12.3, "max(1, 12.3)"),
     (2, "max(min(2, 4), 1)"),
     (2, "max(min(2, 4, 3), 1, 1.5)"),
+    # activation functions
+    (50, "nrelu(75, 50)"),
+    (75, "nrelu(80, 20)"),
+    (0, "nrelu(5, 5)"),
     # pure math precedence
     (1, "2*2-3"),
     (-1, "3-2*2"),
