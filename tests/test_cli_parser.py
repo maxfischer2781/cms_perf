@@ -82,6 +82,7 @@ KNOWN_TRANSFORMS = [
     (50, "relun(75, 50)"),
     (75, "relun(80, 20)"),
     (0, "relun(5, 5)"),
+    (0, "relun(0, 50)"),
     # pure math precedence
     (1, "2*2-3"),
     (-1, "3-2*2"),
