@@ -22,8 +22,6 @@ def just_relu(value: float, bias: float) -> float:
 @cli_call(name="relun")
 def normalized_relu(value: float, bias: float) -> float:
     """Truncate ``value`` below ``bias`` to 0 and normalize the result. This effectively remaps the range ``bias``..100 to 0..100."""
-    if bias >= 100:
-        return 0
-    if value < bias:
+    if bias >= 100 or bias >= value:
         return 0
     return (value - bias) * 100 / (100 - bias)
