@@ -4,7 +4,7 @@ from ..setup import cli_parser
 from .. import __version__ as lib_version
 
 # ensure sensors are loaded
-from ..sensors import sensor, xrd_load, net_load  # noqa  # pyright: ignore
+from ..sensors import sensor, transform, xrd_load, net_load  # noqa  # pyright: ignore
 
 
 class ConfigArgumentParser(argparse.ArgumentParser):
