@@ -8,6 +8,6 @@ def maximum(a: float, b: float, *others: float) -> float:
 
 
 @cli_call(name="min")
-def minimum(a: float, b: float, *others: float):
+def minimum(a: float, b: float, *others: float) -> float:
     """The minimum value of all arguments"""
     return min(a, b, *others)
