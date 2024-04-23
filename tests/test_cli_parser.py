@@ -73,6 +73,20 @@ def test_known_sensor_calls(expected: float, source: str):
     assert expected == sensor()
 
 
+class Almost:
+    def __init__(self, value: float, err: float) -> None:
+        self.value = value
+        self.err = err
+
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, (float, int)):
+            return NotImplemented
+        return abs(value - self.value) <= self.err
+
+    def __repr__(self) -> str:
+        return f"{self.value} ± {self.err}"
+
+
 KNOWN_TRANSFORMS = [
     # min/max transforms
     (12.3, "max(1, 12.3)"),
@@ -83,6 +97,13 @@ KNOWN_TRANSFORMS = [
     (75, "relun(80, 20)"),
     (0, "relun(5, 5)"),
     (0, "relun(0, 50)"),
+    (0, "sigmoid(0)"),
+    (100, "sigmoid(100)"),
+    (50, "sigmoid(50)"),
+    (Almost(90, 2.5), "sigmoid(75)"),
+    (Almost(70, 2.5), "sigmoid(60)"),
+    (Almost(30, 2.5), "sigmoid(40)"),
+    (Almost(10, 2.5), "sigmoid(25)"),
     # pure math precedence
     (1, "2*2-3"),
     (-1, "3-2*2"),
@@ -91,7 +112,7 @@ KNOWN_TRANSFORMS = [
 
 
 @pytest.mark.parametrize("expected, source", KNOWN_TRANSFORMS)
-def test_known_transforms(expected: float, source: str):
+def test_known_transforms(expected: "float | Almost", source: str):
     factory = cli_parser.parse_sensor(source)
     (sensor,) = cli_parser.compile_sensors(0.01, factory)
     assert expected == sensor()
