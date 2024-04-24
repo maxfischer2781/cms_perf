@@ -9,6 +9,7 @@ Sensors for the canonical cms.perf and related measurements
 
 import time
 import enum
+import warnings
 
 import psutil
 
@@ -65,6 +66,16 @@ def network_utilization(interval: float) -> float:
 
 # Individual sensor components
 @cli_call(name="loadq")
+def system_legacy_loadq(interval: float) -> float:
+    """Deprecated alias of ``nloadq``"""
+    warnings.warn(
+        FutureWarning("the 'loadq' sensor is deprecated; use 'nloadq' instead"),
+        stacklevel=1,
+    )
+    return system_loadq(interval)
+
+
+@cli_call(name="nloadq")
 def system_loadq(interval: float) -> float:
     """Absolute system load, the number of active processes"""
     loadavg_index = 0 if interval <= 60 else 1 if interval <= 300 else 2

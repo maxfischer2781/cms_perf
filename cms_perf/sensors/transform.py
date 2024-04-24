@@ -23,29 +23,34 @@ def just_relu(value: float, bias: float) -> float:
     return max(value - bias, 0)
 
 
-@cli_call(name="relun")
-def normalized_relu(value: float, bias: float) -> float:
+@cli_call(name="prelu")
+def normalized_relu(pct: float, bias: float) -> float:
     """
-    Truncate ``value`` below ``bias`` to 0 and normalize the result
+    Truncate ``pct`` below ``bias`` to 0 and normalize the result
 
-    This effectively remaps the range ``bias``..100 to 0..100.
+    This effectively remaps the percentages range ``bias``..100 to 0..100.
     Useful to ignore low load situations in which differences are incosequential.
     """
-    if bias >= 100 or bias >= value:
+    if bias >= 100 or bias >= pct:
         return 0
-    return (value - bias) * 100 / (100 - bias)
+    return (pct - bias) * 100 / (100 - bias)
 
 
 @cli_call(name="erf")
 def just_erf(value: float) -> float:
-    """The error function mapping -inf..inf to -1..1. See :py:func:`math.erf`"""
+    """
+    The error function mapping -inf..inf to -1..1. See :py:func:`math.erf`
+
+    This maps 0 to 0 and increases with diminishing return as ``value`` increases.
+    Useful to map an unbounded counter (such as ``nsockets``) to the bounded range 0..1.
+    """
     return math.erf(value)
 
 
 ERF2PCT_FACTOR = (100 - 0) / (math.erf(2) - math.erf(-2))
 
 
-@cli_call(name="sigmoid")
+@cli_call(name="psigmoid")
 def normalized_erf(value: float) -> float:
     """
     A sigmoid boosting changes around 50, similar to a normalized error function
