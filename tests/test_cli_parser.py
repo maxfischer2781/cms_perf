@@ -8,7 +8,6 @@ from cms_perf.setup import cli_parser
 from cms_perf.sensors import (  # noqa
     sensor as _mount_sensors,
     transform as _mount_transform,
-    net_load as _mount_net_load,
     xrd_load as _mount_xrd_load,
 )
 

@@ -271,7 +271,7 @@ def compile_sensors(
 
 if __name__ == "__main__":
     # provide debug information on the parser
-    from ..sensors import sensor, net_load, xrd_load  # noqa  # pyright: ignore
+    from ..sensors import sensor, xrd_load  # noqa  # pyright: ignore
     from . import cli_parser  # noqa
 
     print("EXPRESSION:", cli_parser.EXPRESSION)

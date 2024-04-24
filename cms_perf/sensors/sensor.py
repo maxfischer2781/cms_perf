@@ -92,3 +92,33 @@ def system_ncpu(kind: CpuKind = CpuKind.all) -> float:
 def system_pswap(interval: float) -> float:
     """Percentage of swap utilisation"""
     return psutil.swap_memory().percent
+
+
+@cli_domain(name="KIND")
+class ConnectionKind(enum.Enum):
+    inet = enum.auto()
+    inet4 = enum.auto()
+    inet6 = enum.auto()
+    tcp = enum.auto()
+    tcp4 = enum.auto()
+    tcp6 = enum.auto()
+    udp = enum.auto()
+    udp4 = enum.auto()
+    udp6 = enum.auto()
+    unix = enum.auto()
+    all = enum.auto()
+
+
+@cli_call(name="nsockets")
+def num_sockets(kind: ConnectionKind = ConnectionKind.tcp) -> float:
+    """
+    Number of open sockets across all processes
+
+    ``kind`` selects which sockets to count, and may be one of
+    ``inet``, ``inet4``, ``inet6``,
+    ``tcp``, ``tcp4``, ``tcp6``,
+    ``udp``, ``udp4``, ``udp6``,
+    ``unix`` or ``all``.
+    It defaults to ``tcp``.
+    """
+    return len(psutil.net_connections(kind=kind.name))
