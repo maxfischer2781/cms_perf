@@ -94,7 +94,7 @@ def system_pswap(interval: float) -> float:
     return psutil.swap_memory().percent
 
 
-@cli_domain(name="KIND")
+@cli_domain(name="NET")
 class ConnectionKind(enum.Enum):
     inet = enum.auto()
     inet4 = enum.auto()
