@@ -66,12 +66,14 @@ def document_cli_call(call_info: cli_parser.CallInfo) -> str:
     return "\n".join(rst_lines)
 
 
-def document_cli_calls() -> str:
+def document_cli_calls(domain: str) -> str:
     """Create the RST for all CLI sensors and transformations"""
     rst_blocks: "list[str]" = []
     for call_info in sorted(
         cli_parser.KNOWN_CALLABLES.values(), key=lambda ci: ci.cli_name
     ):
+        if domain not in call_info.call.__module__.split("."):
+            continue
         rst_blocks.append(document_cli_call(call_info))
     return "\n\n".join(rst_blocks)
 
@@ -84,5 +86,6 @@ with open(TARGET_DIR / "cli_options.rst", "w") as out_stream:
     out_stream.write(document_cli(sensors=False))
 
 
-with open(TARGET_DIR / "cli_callables.rst", "w") as out_stream:
-    out_stream.write(document_cli_calls())
+for call_domain in ("sensor", "transform", "xrd_load"):
+    with open(TARGET_DIR / f"cli_callables_{call_domain}.rst", "w") as out_stream:
+        out_stream.write(document_cli_calls(call_domain))
