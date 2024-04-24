@@ -93,6 +93,7 @@ KNOWN_TRANSFORMS = [
     (2, "max(min(2, 4), 1)"),
     (2, "max(min(2, 4, 3), 1, 1.5)"),
     # activation functions
+    (100, "relun(100, 5)"),
     (50, "relun(75, 50)"),
     (75, "relun(80, 20)"),
     (0, "relun(5, 5)"),
@@ -100,10 +101,12 @@ KNOWN_TRANSFORMS = [
     (0, "sigmoid(0)"),
     (100, "sigmoid(100)"),
     (50, "sigmoid(50)"),
+    (Almost(100, 0.05), "sigmoid(99)"),
     (Almost(90, 2.5), "sigmoid(75)"),
     (Almost(70, 2.5), "sigmoid(60)"),
     (Almost(30, 2.5), "sigmoid(40)"),
     (Almost(10, 2.5), "sigmoid(25)"),
+    (Almost(0, 0.05), "sigmoid(1)"),
     # pure math precedence
     (1, "2*2-3"),
     (-1, "3-2*2"),
