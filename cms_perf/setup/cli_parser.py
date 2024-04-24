@@ -223,7 +223,7 @@ def _register_enum(domain: Type[enum.Enum], cli_name: Optional[str]):
     source_name = cli_name.replace(".", "_")
     assert (
         source_name not in KNOWN_DOMAINS
-    ), f"cannot re-register CLI domain {source_name}"
+    ), f"cannot re-register CLI domain {source_name} as {domain.__module__}:{domain.__qualname__}"
     cases = sorted(domain.__members__, reverse=True)
     match_case = pp.MatchFirst(tuple(map(pp.Keyword, cases))).setName(
         " | ".join(f'"{case}"' for case in cases)
