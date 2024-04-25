@@ -74,8 +74,9 @@ Available Functions
 ===================
 
 A range of functions are provided by ``cms_perf``.
-Note that some functions provide or operate on percentages (e.g. ``pmem``, ``relun``)
+Note that some functions provide or operate on percentages (e.g. ``pmem``, ``prelu``)
 while others provide or operate on absolute values (e.g. ``nsockets``).
+These are indicated by the name prefix ``p`` or ``n``, respectively.
 
 System Sensors
 --------------
