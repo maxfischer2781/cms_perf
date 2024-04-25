@@ -22,7 +22,17 @@ def fake_aliased_sensor_factory(interval: int, value: float = 1):
     return value
 
 
-SENSORS = ["prunq", "loadq", "pcpu", "pmem", "pio"]
+SENSORS = [
+    "prunq",
+    "prunq",
+    "pcpu",
+    "pmem",
+    "pio",
+    "pswap",
+    "nloadq",
+    "ncores",
+    "nsockets",
+]
 
 
 SOURCES = [
