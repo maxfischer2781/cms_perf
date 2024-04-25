@@ -6,19 +6,19 @@ import psutil
 
 from cms_perf.setup import cli_parser
 from cms_perf.sensors import (  # noqa
-    sensor as _mount_sensors,
-    transform as _mount_transform,
-    xrd_load as _mount_xrd_load,
+    sensor as _mount_sensors,  # pyright: ignore[reportUnusedImport]
+    transform as _mount_transform,  # pyright: ignore[reportUnusedImport]
+    xrd_load as _mount_xrd_load,  # pyright: ignore[reportUnusedImport]
 )
 
 
 @cli_parser.cli_call()
-def fake_sensor_factory(interval: int, value=1):
+def fake_sensor_factory(interval: int, value: float = 1):
     return value
 
 
 @cli_parser.cli_call(name="fake.sensor")
-def fake_aliased_sensor_factory(interval: int, value=1):
+def fake_aliased_sensor_factory(interval: int, value: float = 1):
     return value
 
 
