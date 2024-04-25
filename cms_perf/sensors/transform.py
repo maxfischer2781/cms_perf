@@ -53,7 +53,7 @@ ERF2PCT_FACTOR = (100 - 0) / (math.erf(2) - math.erf(-2))
 @cli_call(name="psigmoid")
 def normalized_erf(value: float) -> float:
     """
-    A sigmoid boosting changes around 50, similar to a normalized error function
+    A sigmoid boosting changes around 50 but compressing low/high values
 
     Applying ``sigmoid`` to the range 0..100 compresses the low and high ranges
     (0..25 and 75..100) but expands the medium range (25..75). For load balancing,
