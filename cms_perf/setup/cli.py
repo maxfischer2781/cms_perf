@@ -14,7 +14,7 @@ class ConfigArgumentParser(argparse.ArgumentParser):
     Allows comments and the use of key value notation, as in::
 
         # Set the --prunq option
-        prunq = 100.0*loadq/40/ncores
+        prunq = 100.0*nloadq/40/ncores
     """
 
     def convert_arg_line_to_args(self, arg_line: str) -> "list[str]":
@@ -92,7 +92,7 @@ CLI.add_argument(
 )
 CLI.add_argument(
     "--prunq",
-    default="100.0*loadq/ncores",
+    default="prunq",
     type=cli_parser.parse_sensor,
     help="Expression to compute system load percentage [default: %(default)s]",
 )

@@ -19,7 +19,7 @@ from ..setup.cli_parser import cli_call, cli_domain
 # individual sensors for system state
 @cli_call(name="prunq")
 def system_prunq(interval: float) -> float:
-    """Percentage of system load per core, equivalent to ``100*loadq/ncores``"""
+    """Percentage of system load per core, equivalent to ``100*nloadq/ncores``"""
     loadavg_index = 0 if interval <= 60 else 1 if interval <= 300 else 2
     return 100.0 * psutil.getloadavg()[loadavg_index] / psutil.cpu_count()
 
