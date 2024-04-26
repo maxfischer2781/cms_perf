@@ -73,4 +73,34 @@ or using the name followed by parenthesised arguments.
 Available Functions
 ===================
 
-.. include:: ../generated/cli_callables.rst
+A range of functions are provided by ``cms_perf``.
+Note that some functions provide or operate on percentages (e.g. ``pmem``, ``prelu``)
+while others provide or operate on absolute values (e.g. ``nsockets``).
+These are indicated by the name prefix ``p`` or ``n``, respectively.
+
+System Sensors
+--------------
+
+These functions query information of the overall sytem.
+They are suitable for efficiently getting information on the
+overall load of the system on which XRootD runs.
+
+.. include:: ../generated/cli_callables_sensor.rst
+
+XRootD Sensors
+--------------
+
+These functions inspect local XRootD processes.
+They are less efficient than the system-wide sensors
+but provide a view on the actual work performed by XRootD.
+
+.. include:: ../generated/cli_callables_xrd_load.rst
+
+Transformations
+---------------
+
+These functions transform absolute and percentage values.
+Transformations can be combined and stacked,
+but they fundamentally require sensors or constants as input.
+
+.. include:: ../generated/cli_callables_transform.rst

@@ -221,9 +221,10 @@ def cli_domain(name: Optional[str] = None):
 def _register_enum(domain: Type[enum.Enum], cli_name: Optional[str]):
     cli_name = cli_name if cli_name is not None else domain.__name__
     source_name = cli_name.replace(".", "_")
-    assert (
-        source_name not in KNOWN_DOMAINS
-    ), f"cannot re-register CLI domain {source_name}"
+    assert source_name not in KNOWN_DOMAINS, (
+        f"cannot re-register CLI domain {source_name}"
+        f" as {domain.__module__}:{domain.__qualname__}"
+    )
     cases = sorted(domain.__members__, reverse=True)
     match_case = pp.MatchFirst(tuple(map(pp.Keyword, cases))).setName(
         " | ".join(f'"{case}"' for case in cases)
@@ -269,22 +270,9 @@ def compile_sensors(
     ]
 
 
-# CLI transformations
-@cli_call(name="max")
-def maximum(a: float, b: float, *others: float) -> float:
-    """The maximum value of all arguments"""
-    return max(a, b, *others)
-
-
-@cli_call(name="min")
-def minimum(a: float, b: float, *others: float):
-    """The minimum value of all arguments"""
-    return min(a, b, *others)
-
-
 if __name__ == "__main__":
     # provide debug information on the parser
-    from ..sensors import sensor, net_load, xrd_load  # noqa  # pyright: ignore
+    from ..sensors import sensor, xrd_load  # noqa  # pyright: ignore
     from . import cli_parser  # noqa
 
     print("EXPRESSION:", cli_parser.EXPRESSION)

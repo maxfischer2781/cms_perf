@@ -1,5 +1,5 @@
 """
-Sensors for the canonical cms.perf measurements
+Sensors for the canonical cms.perf and related measurements
 
 .. note::
 
@@ -9,6 +9,7 @@ Sensors for the canonical cms.perf measurements
 
 import time
 import enum
+import warnings
 
 import psutil
 
@@ -18,7 +19,7 @@ from ..setup.cli_parser import cli_call, cli_domain
 # individual sensors for system state
 @cli_call(name="prunq")
 def system_prunq(interval: float) -> float:
-    """Percentage of system load per core"""
+    """Percentage of system load per core, equivalent to ``100*nloadq/ncores``"""
     loadavg_index = 0 if interval <= 60 else 1 if interval <= 300 else 2
     return 100.0 * psutil.getloadavg()[loadavg_index] / psutil.cpu_count()
 
@@ -65,6 +66,16 @@ def network_utilization(interval: float) -> float:
 
 # Individual sensor components
 @cli_call(name="loadq")
+def system_legacy_loadq(interval: float) -> float:
+    """Deprecated alias of ``nloadq``"""
+    warnings.warn(
+        FutureWarning("the 'loadq' sensor is deprecated; use 'nloadq' instead"),
+        stacklevel=1,
+    )
+    return system_loadq(interval)
+
+
+@cli_call(name="nloadq")
 def system_loadq(interval: float) -> float:
     """Absolute system load, the number of active processes"""
     loadavg_index = 0 if interval <= 60 else 1 if interval <= 300 else 2
@@ -82,7 +93,43 @@ def system_ncpu(kind: CpuKind = CpuKind.all) -> float:
     """
     Number of CPU cores, by default including logical cores as well
 
-    ``kind`` selects which cores to count, and may one of ``all`` or ``physical``.
+    ``kind`` selects which cores to count, and may be one of ``all`` or ``physical``.
     It defaults to ``all``.
     """
     return float(psutil.cpu_count(logical=kind is CpuKind.all))
+
+
+@cli_call(name="pswap")
+def system_pswap(interval: float) -> float:
+    """Percentage of swap utilisation"""
+    return psutil.swap_memory().percent
+
+
+@cli_domain(name="NET")
+class ConnectionKind(enum.Enum):
+    inet = enum.auto()
+    inet4 = enum.auto()
+    inet6 = enum.auto()
+    tcp = enum.auto()
+    tcp4 = enum.auto()
+    tcp6 = enum.auto()
+    udp = enum.auto()
+    udp4 = enum.auto()
+    udp6 = enum.auto()
+    unix = enum.auto()
+    all = enum.auto()
+
+
+@cli_call(name="nsockets")
+def num_sockets(kind: ConnectionKind = ConnectionKind.tcp) -> float:
+    """
+    Number of open sockets across all processes
+
+    ``kind`` selects which sockets to count, and may be one of
+    ``inet``, ``inet4``, ``inet6``,
+    ``tcp``, ``tcp4``, ``tcp6``,
+    ``udp``, ``udp4``, ``udp6``,
+    ``unix`` or ``all``.
+    It defaults to ``tcp``.
+    """
+    return len(psutil.net_connections(kind=kind.name))

@@ -4,7 +4,7 @@ from ..setup import cli_parser
 from .. import __version__ as lib_version
 
 # ensure sensors are loaded
-from ..sensors import sensor, xrd_load, net_load  # noqa  # pyright: ignore
+from ..sensors import sensor, transform, xrd_load  # noqa  # pyright: ignore
 
 
 class ConfigArgumentParser(argparse.ArgumentParser):
@@ -14,7 +14,7 @@ class ConfigArgumentParser(argparse.ArgumentParser):
     Allows comments and the use of key value notation, as in::
 
         # Set the --prunq option
-        prunq = 100.0*loadq/40/ncores
+        prunq = 100.0*nloadq/40/ncores
     """
 
     def convert_arg_line_to_args(self, arg_line: str) -> "list[str]":
@@ -92,7 +92,7 @@ CLI.add_argument(
 )
 CLI.add_argument(
     "--prunq",
-    default="100.0*loadq/ncores",
+    default="prunq",
     type=cli_parser.parse_sensor,
     help="Expression to compute system load percentage [default: %(default)s]",
 )

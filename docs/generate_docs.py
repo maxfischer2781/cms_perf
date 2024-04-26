@@ -1,6 +1,11 @@
+"""
+Write RST files for the CLI options and parser elements
+"""
+
 from pathlib import Path
 import inspect
 import textwrap
+import argparse
 
 from cms_perf.setup import cli_parser, cli
 
@@ -8,17 +13,26 @@ TARGET_DIR = Path(__file__).parent / "generated"
 TARGET_DIR.mkdir(exist_ok=True)
 
 
-def normalized_doc(obj):
-    return textwrap.dedent(obj.__doc__).strip()
+def normalized_doc(obj: object) -> str:
+    return textwrap.dedent(obj.__doc__ or "").strip()
 
 
-def document_cli_sensors():
-    rst_lines = []
+def document_cli(*, sensors: bool) -> str:
+    """Create the RST for all CLI sensor or other options"""
+    rst_lines: "list[str]" = []
     for action in cli.CLI._actions:
-        if action.type != cli_parser.parse_sensor:
+        if (action.type != cli_parser.parse_sensor) == sensors:
             continue
         cli_name = max(action.option_strings, key=len)
-        rst_lines.append(f"``{cli_name}={action.default}``\n   {action.help}\n")
+        assert action.help is not None, "all CLI options must have a 'help' text"
+        cli_help = (
+            action.help + r" [default: %(default)s]"
+            if r"%(default)s" not in action.help
+            and action.default is not argparse.SUPPRESS
+            else action.help
+        )
+        default = dict(default=f"``{action.default}``")
+        rst_lines.append(f"``{cli_name}``\n   {cli_help % default}\n")
     return "\n".join(rst_lines)
 
 
@@ -27,7 +41,8 @@ def is_variadic(param: inspect.Parameter):
 
 
 def document_cli_call(call_info: cli_parser.CallInfo) -> str:
-    rst_lines = []
+    """Create the RST for a single CLI sensor or transformation"""
+    rst_lines: "list[str]" = []
     parameters = inspect.signature(call_info.call).parameters
     parameters = {k: v for k, v in parameters.items() if k != "interval"}
     default_callable = all(
@@ -51,18 +66,26 @@ def document_cli_call(call_info: cli_parser.CallInfo) -> str:
     return "\n".join(rst_lines)
 
 
-def document_cli_calls():
-    rst_blocks = []
+def document_cli_calls(domain: str) -> str:
+    """Create the RST for all CLI sensors and transformations"""
+    rst_blocks: "list[str]" = []
     for call_info in sorted(
         cli_parser.KNOWN_CALLABLES.values(), key=lambda ci: ci.cli_name
     ):
+        if domain not in call_info.call.__module__.split("."):
+            continue
         rst_blocks.append(document_cli_call(call_info))
     return "\n\n".join(rst_blocks)
 
 
 with open(TARGET_DIR / "cli_sensors.rst", "w") as out_stream:
-    out_stream.write(document_cli_sensors())
+    out_stream.write(document_cli(sensors=True))
 
 
-with open(TARGET_DIR / "cli_callables.rst", "w") as out_stream:
-    out_stream.write(document_cli_calls())
+with open(TARGET_DIR / "cli_options.rst", "w") as out_stream:
+    out_stream.write(document_cli(sensors=False))
+
+
+for call_domain in ("sensor", "transform", "xrd_load"):
+    with open(TARGET_DIR / f"cli_callables_{call_domain}.rst", "w") as out_stream:
+        out_stream.write(document_cli_calls(call_domain))
